@@ -3,6 +3,7 @@ import Hero from "../components/Hero";
 import LatestCollection from "../components/LatestCollection";
 import { ShopContext } from "../context/ShopContext";
 import BestSeller from "../components/BestSeller";
+import OurPolicy from "../components/OurPolicy";
 
 const Home = () => {
   const { addToCart } = useContext(ShopContext);
@@ -12,6 +13,7 @@ const Home = () => {
       <Hero />
       <LatestCollection />
       <BestSeller />
+      <OurPolicy  />
       <div className="p-6">
         <button
           onClick={() => addToCart("test-1")}

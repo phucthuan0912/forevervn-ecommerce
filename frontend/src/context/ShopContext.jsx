@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from "react";
-import { products } from "../assets/assets"; // mock data như video
+import { products } from "../assets/assets";
 
 export const ShopContext = createContext(null);
 
@@ -13,7 +13,8 @@ function loadCart() {
 }
 
 const ShopContextProvider = ({ children }) => {
-  const currency = "₫";
+  // Không dùng ký hiệu tiền tệ nữa
+  const currency = ""; // hoặc null
   const delivery_fee = 30000;
 
   const [cartItems, setCartItems] = useState(() => loadCart());
@@ -50,12 +51,12 @@ const ShopContextProvider = ({ children }) => {
   const getCartCount = () =>
     Object.values(cartItems).reduce((sum, q) => sum + q, 0);
 
-  // tạm tính amount dựa trên mock products
+  // Tính tổng (price phải là number)
   const getCartAmount = () => {
     let total = 0;
     for (const id in cartItems) {
       const item = products.find((p) => String(p._id || p.id) === String(id));
-      if (item) total += (item.price || 0) * cartItems[id];
+      if (item) total += (Number(item.price) || 0) * cartItems[id];
     }
     return total;
   };

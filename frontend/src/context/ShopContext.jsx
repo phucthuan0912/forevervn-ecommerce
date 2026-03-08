@@ -11,9 +11,9 @@ function loadCart() {
         return {};
     }
 }
-function parseVndPrice(price) {
-    if (typeof price === 'number') return price * 1000;
 
+function parseVndPrice(price) {
+    if (typeof price === 'number') return price < 1000 ? price * 1000 : price;
     if (typeof price === 'string') {
         const digits = price.replace(/[^\d]/g, '');
         if (!digits) return 0;
@@ -21,57 +21,90 @@ function parseVndPrice(price) {
         if (!Number.isFinite(n)) return 0;
         return n < 1000 ? n * 1000 : n;
     }
-
     return 0;
 }
+
 const ShopContextProvider = ({ children }) => {
-    // Không dùng ký hiệu tiền tệ nữa
-    const currency = ''; // hoặc null
+    const currency = '';
     const delivery_fee = 30000;
-    const [search, setSearch] = useState('');
+
+    const [search, setSearch]         = useState('');
     const [showSearch, setShowSearch] = useState(false);
-    const [cartItems, setCartItems] = useState(() => loadCart());
+    const [cartItems, setCartItems]   = useState(() => loadCart());
 
     useEffect(() => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    const addToCart = (id, qty = 1) => {
-        setCartItems((prev) => ({ ...prev, [id]: (prev[id] || 0) + qty }));
+    // ── Thêm vào giỏ theo id + size ──────────────────────────────
+    // cartItems: { "aaaab": { "M": 2, "L": 1 }, "aaaac": { "S": 1 } }
+    const addToCart = async (itemId, size) => {
+        let cartData = structuredClone(cartItems);
+
+        if (cartData[itemId]) {
+            if (cartData[itemId][size]) {
+                cartData[itemId][size] += 1;   // tăng số lượng
+            } else {
+                cartData[itemId][size] = 1;    // thêm size mới
+            }
+        } else {
+            cartData[itemId] = {};
+            cartData[itemId][size] = 1;        // thêm sản phẩm mới
+        }
+
+        setCartItems(cartData);
     };
 
-    const removeFromCart = (id, qty = 1) => {
-        setCartItems((prev) => {
-            const current = prev[id] || 0;
-            const next = current - qty;
-            const copy = { ...prev };
-            if (next <= 0) delete copy[id];
-            else copy[id] = next;
-            return copy;
-        });
+    // ── Xóa 1 size khỏi giỏ ──────────────────────────────────────
+    const removeFromCart = (itemId, size) => {
+        let cartData = structuredClone(cartItems);
+        if (cartData[itemId]) {
+            delete cartData[itemId][size];
+            if (Object.keys(cartData[itemId]).length === 0) {
+                delete cartData[itemId];
+            }
+        }
+        setCartItems(cartData);
     };
 
-    const updateCartQty = (id, qty) => {
+    // ── Cập nhật số lượng theo id + size ─────────────────────────
+    const updateCartQty = (itemId, size, qty) => {
+        let cartData = structuredClone(cartItems);
         const n = Number(qty);
-        setCartItems((prev) => {
-            const copy = { ...prev };
-            if (!n || n <= 0) delete copy[id];
-            else copy[id] = n;
-            return copy;
-        });
+        if (!n || n <= 0) {
+            delete cartData[itemId][size];
+            if (Object.keys(cartData[itemId]).length === 0) {
+                delete cartData[itemId];
+            }
+        } else {
+            cartData[itemId][size] = n;
+        }
+        setCartItems(cartData);
     };
 
-    const getCartCount = () =>
-        Object.values(cartItems).reduce((sum, q) => sum + q, 0);
+    // ── Tổng số lượng tất cả sản phẩm ────────────────────────────
+    const getCartCount = () => {
+        let count = 0;
+        for (const itemId in cartItems) {
+            for (const size in cartItems[itemId]) {
+                count += cartItems[itemId][size];
+            }
+        }
+        return count;
+    };
 
-    // Tính tổng (price phải là number)
+    // ── Tổng tiền ─────────────────────────────────────────────────
     const getCartAmount = () => {
         let total = 0;
-        for (const id in cartItems) {
+        for (const itemId in cartItems) {
             const item = products.find(
-                (p) => String(p._id || p.id) === String(id),
+                (p) => String(p._id || p.id) === String(itemId)
             );
-            if (item) total += parseVndPrice(item.price) * (cartItems[id] || 0);
+            if (item) {
+                for (const size in cartItems[itemId]) {
+                    total += parseVndPrice(item.price) * cartItems[itemId][size];
+                }
+            }
         }
         return total;
     };

@@ -1,13 +1,13 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
-dotenv.config();
+import { use } from 'react';
 // APP config
 const app = express();
 const port = process.env.PORT || 4000;
+
 // Kết nối MongoDB
 connectDB();
 connectCloudinary();
@@ -15,6 +15,9 @@ connectCloudinary();
 // Middleware ← Kiểm tra token, quyền truy cập, v.v.`
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/user', userRoutes) 
+
 // Các route API sẽ được định nghĩa ở đây routes/
 app.get('/', (req, res) => {
     res.send('Hello World! API đang chạy...');

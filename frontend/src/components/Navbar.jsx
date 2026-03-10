@@ -53,11 +53,11 @@ const Navbar = () => {
                     alt="Search"
                 />
                 <div className="group relative">
-                    <img
+                    <Link to='/login'><img
                         className="w-5 cursor-pointer"
                         src={assets.profile_icon}
                         alt="Profile"
-                    />
+                    /></Link>
 
                     {/* Dropdown Menu - Hiển thị khi hover vào group */}
                     <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">

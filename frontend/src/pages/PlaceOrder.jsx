@@ -61,7 +61,7 @@ const PlaceOrder = () => {
                     </div>
                 </div>
 
-                {/* Payment Method */}
+             
                 {/* Payment Method */}
                 <div className='mt-12'>
                     <Title text1={'PAYMENT'} text2={'METHOD'} />

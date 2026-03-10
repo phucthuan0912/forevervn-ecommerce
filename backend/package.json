@@ -6,7 +6,6 @@
   "author": "",
   "type": "module",
   "main": "server.js",
-
   "scripts": {
     "start": "node server.js",
     "serve": "nodemon server.js",

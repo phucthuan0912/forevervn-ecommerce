@@ -3,7 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv/config';
 import connectDB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
-import { use } from 'react';
+import userRouter from './routes/userRouter.js';
+
 // APP config
 const app = express();
 const port = process.env.PORT || 4000;
@@ -16,7 +17,7 @@ connectCloudinary();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/user', userRoutes) 
+app.use('/api/user', userRouter) 
 
 // Các route API sẽ được định nghĩa ở đây routes/
 app.get('/', (req, res) => {

@@ -40,5 +40,14 @@ const addProduct = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 };
+const removeProduct = async (req, res) => {
+    try {
+        await productModel.findByIdAndDelete(req.body.id);
+        res.json({ success: true, message: 'Product Removed' });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
 
-export { addProduct };
+export { addProduct, removeProduct };

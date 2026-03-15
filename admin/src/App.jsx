@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from './components/Navbar'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Sidebar from './components/Sidebar'
 
 const App = () => {
 
@@ -10,6 +11,9 @@ const App = () => {
       <ToastContainer />
       <Navbar setToken={() => {}} />  
       <hr />
+      <div className='flex'>
+        <Sidebar />
+      </div>
     </div>
   )
 }

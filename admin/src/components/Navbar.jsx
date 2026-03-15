@@ -17,7 +17,7 @@ const Navbar = ({ setToken }) => {
   return (
     <nav className='flex items-center justify-between py-4 px-[4%] bg-white dark:bg-gray-900 transition-colors'>
 
-      <img src={logo} alt='logo' className='w-[max(15%,150px)]' />
+      <img src={logo} alt='logo' className='w-[max(15%,150px)]'  />
 
       <div className='flex items-center gap-5 mr-4'>
         <button

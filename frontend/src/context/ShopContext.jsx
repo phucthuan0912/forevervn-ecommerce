@@ -155,8 +155,16 @@ const ShopContextProvider = ({ children }) => {
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState(() => loadCartFromStorage());
     const [products, setProducts] = useState([]);
-
+    const [token, setToken] = useState('');
     const navigate = useNavigate();
+
+    // CHANGE: khoi tao token tu localStorage khi app mount
+    useEffect(() => {
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) {
+            setToken(savedToken);
+        }
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
@@ -332,6 +340,12 @@ const ShopContextProvider = ({ children }) => {
     useEffect(() => {
         reconcileCartItems();
     }, [reconcileCartItems]);
+    // CHANGE: gom logic dang xuat dung chung
+    const logout = useCallback(() => {
+        localStorage.removeItem('token');
+        setToken('');
+        navigate('/login');
+    }, [navigate]);
 
     // CHANGE: bo sung dependency de tranh stale context value
     const value = useMemo(
@@ -351,7 +365,9 @@ const ShopContextProvider = ({ children }) => {
             showSearch,
             setShowSearch,
             backendUrl,
-            getProductsData,
+            getProductsData,            token,
+            setToken,
+            logout,
         }),
         [
             products,
@@ -365,7 +381,8 @@ const ShopContextProvider = ({ children }) => {
             search,
             showSearch,
             backendUrl,
-            getProductsData,
+            getProductsData,            token, // CHANGE: them token vao dependency de context cap nhat khi dang nhap
+            logout,
         ],
     );
 
@@ -375,4 +392,7 @@ const ShopContextProvider = ({ children }) => {
 };
 
 export default ShopContextProvider;
+
+
+
 

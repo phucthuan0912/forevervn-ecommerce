@@ -1,0 +1,108 @@
+﻿import userModel from '../models/userModel.js';
+
+// Add products to user cart
+const addToCart = async (req, res) => {
+    try {
+        const { userId, itemId, size } = req.body;
+
+        if (!userId || !itemId || !size) {
+            return res.json({ success: false, message: 'Missing required fields' });
+        }
+
+        const userData = await userModel.findById(userId);
+
+        if (!userData) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const cartData = userData.cartData || {};
+
+        if (!cartData[itemId]) {
+            cartData[itemId] = {};
+        }
+
+        cartData[itemId][size] = (Number(cartData[itemId][size]) || 0) + 1;
+
+        await userModel.findByIdAndUpdate(userId, { cartData });
+        res.json({ success: true, message: 'Added To Cart' });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// Update user cart
+const updateCart = async (req, res) => {
+    try {
+        const { userId, itemId, size, quantity, cartData: nextCartData } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, message: 'Missing user id' });
+        }
+
+        if (nextCartData && typeof nextCartData === 'object') {
+            await userModel.findByIdAndUpdate(userId, { cartData: nextCartData });
+            return res.json({ success: true, message: 'Cart Updated' });
+        }
+
+        if (!itemId || !size || typeof quantity === 'undefined') {
+            return res.json({ success: false, message: 'Missing required fields' });
+        }
+
+        const userData = await userModel.findById(userId);
+
+        if (!userData) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const cartData = userData.cartData || {};
+        const qty = Number(quantity);
+
+        if (!cartData[itemId]) {
+            cartData[itemId] = {};
+        }
+
+        if (!qty || qty <= 0) {
+            delete cartData[itemId][size];
+
+            if (Object.keys(cartData[itemId]).length === 0) {
+                delete cartData[itemId];
+            }
+        } else {
+            cartData[itemId][size] = qty;
+        }
+
+        await userModel.findByIdAndUpdate(userId, { cartData });
+        res.json({ success: true, message: 'Cart Updated' });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+// Get user cart data
+const getUserCart = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, message: 'Missing user id' });
+        }
+
+        const userData = await userModel.findById(userId);
+
+        if (!userData) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        res.json({ success: true, cartData: userData.cartData || {} });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { addToCart, updateCart, getUserCart };

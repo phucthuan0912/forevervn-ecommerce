@@ -135,19 +135,19 @@ const PlaceOrder = () => {
     return (
         <form
             onSubmit={onSubmitHandler}
-            className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
+            className="grid gap-6 py-4 sm:py-6 lg:grid-cols-[minmax(0,1fr)_380px]"
         >
-            <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
-                <div className="text-xl sm:text-2xl my-3">
+            <section className="section-shell px-5 py-6 sm:px-8 sm:py-8">
+                <div className="mb-8">
                     <Title text1={'DELIVERY'} text2={'INFORMATION'} />
                 </div>
 
-                <div className="flex gap-3">
+                <div className="grid gap-4 sm:grid-cols-2">
                     <input
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="First name"
                         required
@@ -156,39 +156,34 @@ const PlaceOrder = () => {
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="Last name"
                         required
                     />
-                </div>
-
-                <input
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-                    type="email"
-                    placeholder="Email address"
-                    required
-                />
-
-                <input
-                    name="street"
-                    value={formData.street}
-                    onChange={handleChange}
-                    className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-                    type="text"
-                    placeholder="Street"
-                    required
-                />
-
-                <div className="flex gap-3">
+                    <input
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="sm:col-span-2 rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                        type="email"
+                        placeholder="Email address"
+                        required
+                    />
+                    <input
+                        name="street"
+                        value={formData.street}
+                        onChange={handleChange}
+                        className="sm:col-span-2 rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                        type="text"
+                        placeholder="Street"
+                        required
+                    />
                     <input
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="City"
                         required
@@ -197,19 +192,16 @@ const PlaceOrder = () => {
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="State"
                         required
                     />
-                </div>
-
-                <div className="flex gap-3">
                     <input
                         name="zipcode"
                         value={formData.zipcode}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="Zipcode"
                         required
@@ -218,31 +210,28 @@ const PlaceOrder = () => {
                         name="country"
                         value={formData.country}
                         onChange={handleChange}
-                        className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
                         type="text"
                         placeholder="Country"
                         required
                     />
+                    <input
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="sm:col-span-2 rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                        type="text"
+                        placeholder="Phone"
+                        required
+                    />
                 </div>
+            </section>
 
-                <input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-                    type="text"
-                    placeholder="Phone"
-                    required
-                />
-            </div>
+            <aside className="lg:sticky lg:top-[140px] lg:h-fit">
+                <div className="section-shell p-6 sm:p-7">
+                    <Title text1={'CART'} text2={'TOTALS'} />
 
-            <div className="mt-8">
-                <div className="mt-8 min-w-80">
-                    <div className="text-xl sm:text-2xl">
-                        <Title text1={'CART'} text2={'TOTALS'} />
-                    </div>
-
-                    <div className="flex flex-col gap-2 mt-2 text-sm">
+                    <div className="mt-6 space-y-4 text-sm text-slate-600">
                         <div className="flex justify-between">
                             <p>Subtotal</p>
                             <p>
@@ -250,8 +239,6 @@ const PlaceOrder = () => {
                                 {getCartAmount().toLocaleString('vi-VN')} VND
                             </p>
                         </div>
-
-                        <hr />
 
                         <div className="flex justify-between">
                             <p>Shipping Fee</p>
@@ -261,41 +248,37 @@ const PlaceOrder = () => {
                             </p>
                         </div>
 
-                        <hr />
-
-                        <div className="flex justify-between font-bold">
-                            <p>Total</p>
-                            <p>
-                                {currency}
-                                {(getCartAmount() + delivery_fee).toLocaleString('vi-VN')} VND
-                            </p>
+                        <div className="rounded-[22px] bg-slate-900 px-5 py-4 text-base font-semibold text-white">
+                            <div className="flex justify-between">
+                                <p>Total</p>
+                                <p>
+                                    {currency}
+                                    {(getCartAmount() + delivery_fee).toLocaleString('vi-VN')} VND
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="mt-12">
-                    <Title text1={'PAYMENT'} text2={'METHOD'} />
+                    <div className="mt-8 rounded-[24px] border border-[var(--border)] bg-white p-5">
+                        <Title text1={'PAYMENT'} text2={'METHOD'} />
 
-                    <div className="flex gap-3 flex-col lg:flex-row mt-4">
-                        <div className="flex items-center gap-3 border p-3 px-5 min-w-[130px] border-green-500">
-                            <span className="w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 bg-green-500 border-green-500" />
-                            <p className="text-gray-500 text-sm font-medium mx-4">
+                        <div className="mt-4 flex items-center gap-3 rounded-[20px] border border-emerald-200 bg-emerald-50 px-4 py-4">
+                            <span className="h-3.5 w-3.5 rounded-full bg-emerald-500" />
+                            <p className="text-sm font-medium text-slate-600">
                                 CASH ON DELIVERY
                             </p>
                         </div>
                     </div>
-                </div>
 
-                <div className="w-full text-end mt-8">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-black text-white text-sm px-16 py-3 disabled:opacity-60"
+                        className="mt-6 w-full rounded-full bg-slate-900 px-6 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_18px_36px_rgba(15,23,42,0.16)] hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-60"
                     >
-                        {loading ? 'PROCESSING...' : 'PLACE ORDER'}
+                        {loading ? 'Processing...' : 'Place Order'}
                     </button>
                 </div>
-            </div>
+            </aside>
         </form>
     );
 };

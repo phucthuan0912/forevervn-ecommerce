@@ -167,79 +167,84 @@ const Orders = () => {
   const visibleOrders = isLoggedIn ? orderData : []
 
   return (
-    <div className='border-t pt-16'>
-      <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
-        <div>
-          <div className='text-2xl'>
+    <div className='space-y-6 py-4 sm:space-y-8 sm:py-6'>
+      <section className='section-shell px-5 py-6 sm:px-8 sm:py-8'>
+        <div className='flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
+          <div>
             <Title text1={'MY'} text2={'ORDERS'} />
+            <p className='mt-4 text-sm leading-7 text-slate-500 sm:text-base'>
+              {account?.email
+                ? `Current account: ${account.email}. Order status syncs from admin automatically every 10 seconds.`
+                : 'Order status syncs from admin automatically every 10 seconds.'}
+            </p>
           </div>
-          <p className='mt-2 text-sm text-gray-500'>
-            {account?.email
-              ? `Current account: ${account.email}. Order status syncs from admin automatically every 10 seconds.`
-              : 'Order status syncs from admin automatically every 10 seconds.'}
-          </p>
+
+          {isLoggedIn ? (
+            <button
+              onClick={loadOrderData}
+              disabled={loading}
+              className='inline-flex items-center justify-center rounded-full border border-[var(--border)] px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-900 hover:text-white disabled:opacity-60'
+              type='button'
+            >
+              {loading ? 'Loading...' : 'Refresh Status'}
+            </button>
+          ) : null}
         </div>
+      </section>
 
-        {isLoggedIn ? (
-          <button
-            onClick={loadOrderData}
-            disabled={loading}
-            className='inline-flex items-center justify-center rounded-sm border px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-orange-400 hover:text-orange-500 disabled:cursor-not-allowed disabled:opacity-60'
-          >
-            {loading ? 'Loading...' : 'Refresh status'}
-          </button>
-        ) : null}
-      </div>
-
-      <div className='mt-6'>
+      <section className='space-y-4'>
         {!isLoggedIn ? (
-          <div className='border-y py-10 text-center'>
-            <p className='text-sm text-gray-600'>Please sign in to view the orders placed by your account.</p>
+          <div className='section-shell px-6 py-12 text-center'>
+            <p className='text-base font-semibold text-slate-900'>Please sign in to view the orders placed by your account.</p>
             <button
               onClick={() => navigate('/login')}
-              className='mt-4 rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:border-orange-400 hover:text-orange-500'
+              className='mt-5 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-white'
+              type='button'
             >
-              Go to login
+              Go To Login
             </button>
           </div>
         ) : isInitialLoading ? (
-          <p className='border-y py-10 text-center text-sm text-gray-500'>Loading your orders...</p>
+          <div className='section-shell px-6 py-12 text-center text-sm text-slate-500'>
+            Loading your orders...
+          </div>
         ) : visibleOrders.length === 0 ? (
-          <div className='border-y py-10 text-center'>
-            <p className='text-sm text-gray-500'>No orders found for this account.</p>
+          <div className='section-shell px-6 py-12 text-center'>
+            <p className='text-base font-semibold text-slate-900'>No orders found for this account.</p>
             {account?.email ? (
-              <p className='mt-2 text-xs text-gray-400'>Signed in as {account.email}</p>
+              <p className='mt-2 text-sm text-slate-400'>Signed in as {account.email}</p>
             ) : null}
-            <p className='mx-auto mt-2 max-w-xl text-xs text-gray-400'>
+            <p className='mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-500'>
               Orders only appear for the same account that placed them. If admin can see the order but this page is empty, sign in with that account here.
             </p>
             <button
               onClick={() => navigate('/login')}
-              className='mt-4 rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:border-orange-400 hover:text-orange-500'
+              className='mt-5 rounded-full border border-[var(--border)] px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-900 hover:text-white'
+              type='button'
             >
-              Switch account
+              Switch Account
             </button>
           </div>
         ) : (
           visibleOrders.map((item) => (
-            <div
+            <article
               key={item.orderKey}
-              className='flex flex-col gap-4 border-b border-t py-4 text-gray-700 md:flex-row md:items-center md:justify-between'
+              className='section-shell flex flex-col gap-5 px-5 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between'
             >
-              <div className='flex items-start gap-6 text-sm'>
+              <div className='flex items-start gap-4 sm:gap-5'>
                 <img
-                  className='w-16 rounded-md border border-gray-200 object-cover sm:w-20'
+                  className='h-24 w-20 rounded-[20px] object-cover'
                   src={getItemImage(item.image)}
                   alt={item.name || 'Product'}
                 />
 
                 <div>
-                  <p className='text-base font-medium sm:text-lg'>{item.name}</p>
-                  <p className='mt-1 text-xs uppercase tracking-[0.18em] text-gray-400'>
+                  <p className='text-lg font-semibold text-slate-900'>{item.name}</p>
+                  <p className='mt-1 text-xs uppercase tracking-[0.18em] text-slate-400'>
                     Order #{String(item.orderId || '').slice(-8).toUpperCase()}
                   </p>
 
-                  <div className='mt-2 flex flex-wrap items-center gap-3 text-base text-gray-700'>
+                  <div className='mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-500'>
                     <p>
                       {currency}
                       {Number(item.price || 0).toLocaleString('vi-VN')} VND
@@ -248,39 +253,40 @@ const Orders = () => {
                     <p>Size: {item.size || 'Free'}</p>
                   </div>
 
-                  <p className='mt-2'>
+                  <p className='mt-2 text-sm text-slate-500'>
                     Date:{' '}
-                    <span className='text-gray-400'>
+                    <span>
                       {item.date ? new Date(item.date).toLocaleString('vi-VN') : '-'}
                     </span>
                   </p>
 
-                  <p className='mt-2'>
+                  <p className='mt-2 text-sm text-slate-500'>
                     Payment:{' '}
-                    <span className='text-gray-400'>
+                    <span>
                       {item.paymentMethod || 'COD'} {item.payment ? '(Paid)' : '(Pending)'}
                     </span>
                   </p>
                 </div>
               </div>
 
-              <div className='flex flex-col gap-3 md:min-w-[220px] md:items-end'>
-                <div className='flex items-center gap-2'>
-                  <p className={`h-2 min-w-2 rounded-full ${getStatusDotClass(item.status)}`} />
-                  <p className='text-sm font-medium md:text-base'>{item.status || 'Unknown'}</p>
+              <div className='flex flex-col gap-3 lg:min-w-[220px] lg:items-end'>
+                <div className='flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-slate-700'>
+                  <span className={`h-2.5 w-2.5 rounded-full ${getStatusDotClass(item.status)}`} />
+                  {item.status || 'Unknown'}
                 </div>
 
                 <button
                   onClick={loadOrderData}
-                  className='rounded-sm border px-4 py-2 text-sm font-medium transition-colors hover:border-orange-400 hover:text-orange-500'
+                  className='rounded-full border border-[var(--border)] px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-900 hover:text-white'
+                  type='button'
                 >
-                  Track order
+                  Track Order
                 </button>
               </div>
-            </div>
+            </article>
           ))
         )}
-      </div>
+      </section>
     </div>
   )
 }

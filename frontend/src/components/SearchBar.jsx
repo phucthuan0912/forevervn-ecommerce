@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { ShopContext } from '../context/ShopContext'
-import { assets } from '../assets/assets'
 import { useLocation } from 'react-router-dom'
+import { assets } from '../assets/assets'
+import { ShopContext } from '../context/ShopContext'
 
 const SearchBar = () => {
     const { search, setSearch, showSearch, setShowSearch } = useContext(ShopContext);
@@ -10,35 +10,43 @@ const SearchBar = () => {
 
     useEffect(() => {
         if (location.pathname.includes('collection')) {
-            setVisible(true);   // chỉ hiện SearchBar khi ở trang /collection
+            setVisible(true);
         } else {
-            setVisible(false);  // ẩn ở các trang khác
+            setVisible(false);
+            setShowSearch(false);
         }
-    }, [location]);
-    return showSearch ? (
-        <div className='border-t border-b bg-gray-50 text-center'>
-            <div className='inline-flex items-center justify-center border border-gray-400 px-5 py-2 my-5 mx-3 rounded-full w-3/4 sm:w-1/2'>
-                <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className='flex-1 outline-none bg-inherit text-sm'
-                    type="text"
-                    placeholder='Tìm kiếm...'
-                />
-                <img
-                    className='w-4'
-                    src={assets.search_icon}
-                    alt="search"
-                />
+    }, [location.pathname, setShowSearch]);
+
+    if (!visible || !showSearch) return null;
+
+    return (
+        <div className='sticky top-[104px] z-40 mb-6 sm:top-[116px]'>
+            <div className='section-shell flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
+                <div className='flex flex-1 items-center gap-3 rounded-full border border-[var(--border)] bg-white px-4 py-3 shadow-[0_10px_25px_rgba(15,23,42,0.06)]'>
+                    <img
+                        className='w-4'
+                        src={assets.search_icon}
+                        alt='search'
+                    />
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className='flex-1 bg-transparent text-sm outline-none sm:text-base'
+                        type='text'
+                        placeholder='Tìm kiếm sản phẩm, mô tả hoặc danh mục...'
+                    />
+                </div>
+
+                <button
+                    onClick={() => setShowSearch(false)}
+                    className='inline-flex items-center justify-center rounded-full border border-[var(--border)] px-4 py-3 text-sm font-semibold tracking-[0.14em] text-slate-600 hover:bg-slate-900 hover:text-white'
+                    type='button'
+                >
+                    Đóng
+                </button>
             </div>
-            <img
-                onClick={() => setShowSearch(false)}
-                className='inline w-3 cursor-pointer'
-                src={assets.cross_icon}
-                alt="close"
-            />
         </div>
-    ) : null
+    );
 }
 
 export default SearchBar

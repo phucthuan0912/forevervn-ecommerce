@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
-import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
 
-// ====== PARSE PRICE ======
 const parsePrice = (price) => {
     if (typeof price === 'number') return price < 1000 ? price * 1000 : price;
 
@@ -18,24 +16,19 @@ const parsePrice = (price) => {
 };
 
 const Collection = () => {
-    const { products, search } = useContext(ShopContext);
+    const { products, search, setSearch } = useContext(ShopContext);
 
     const [showFilter, setShowFilter] = useState(false);
-
     const [category, setCategory] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
     const [sortType, setSortType] = useState('relavent');
-
-    // ====== Extra "hay" ======
-    const [minPrice, setMinPrice] = useState(''); // bạn có thể nhập 100 hoặc 100.000
+    const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [onlyBestSeller, setOnlyBestSeller] = useState(false);
 
-    // Load more
     const STEP = 16;
     const [visibleCount, setVisibleCount] = useState(STEP);
 
-    // Reset load more khi filter/sort thay đổi
     useEffect(() => {
         setVisibleCount(STEP);
     }, [
@@ -49,7 +42,6 @@ const Collection = () => {
         products,
     ]);
 
-    // ====== Toggle category ======
     const toggleCategory = (e) => {
         const value = e.target.value;
         setCategory((prev) =>
@@ -59,7 +51,6 @@ const Collection = () => {
         );
     };
 
-    // ====== Toggle subCategory ======
     const toggleSubCategory = (e) => {
         const value = e.target.value;
         setSubCategory((prev) =>
@@ -79,26 +70,21 @@ const Collection = () => {
         setOnlyBestSeller(false);
     };
 
-    // ====== Filter + Sort bằng useMemo (gọn và ít bug) ======
     const filteredAndSorted = useMemo(() => {
         let list = Array.isArray(products) ? [...products] : [];
 
-        // 1) Filter category
         if (category.length > 0) {
             list = list.filter((p) => category.includes(p.category));
         }
 
-        // 2) Filter subCategory
         if (subCategory.length > 0) {
             list = list.filter((p) => subCategory.includes(p.subCategory));
         }
 
-        // 3) Bestseller
         if (onlyBestSeller) {
             list = list.filter((p) => p.bestseller === true);
         }
 
-        // 4) Search
         const q = search.trim().toLowerCase();
         if (q) {
             list = list.filter((p) => {
@@ -108,14 +94,12 @@ const Collection = () => {
             });
         }
 
-        // 5) Price range
         const min = minPrice !== '' ? parsePrice(minPrice) : null;
         const max = maxPrice !== '' ? parsePrice(maxPrice) : null;
 
         if (min !== null) list = list.filter((p) => parsePrice(p.price) >= min);
         if (max !== null) list = list.filter((p) => parsePrice(p.price) <= max);
 
-        // 6) Sort
         switch (sortType) {
             case 'low-high':
                 list.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
@@ -137,7 +121,6 @@ const Collection = () => {
                 );
                 break;
             default:
-                // relavent: giữ nguyên thứ tự gốc
                 break;
         }
 
@@ -157,207 +140,207 @@ const Collection = () => {
     const hasMore = visibleCount < filteredAndSorted.length;
 
     return (
-        <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
-            {/* ===== FILTER SIDEBAR ===== */}
-            <div className="min-w-60">
-                <p
-                    onClick={() => setShowFilter(!showFilter)}
-                    className="my-2 text-xl flex items-center cursor-pointer gap-2"
-                >
-                    FILTERS
-                    <img
-                        className={`h-3 sm:hidden ${showFilter ? 'rotate-90' : ''}`}
-                        src={assets.dropdown_icon}
-                        alt=""
-                    />
-                </p>
-
-                {/* Price range */}
-                <div
-                    className={`border border-gray-300 p-4 mt-4 ${showFilter ? '' : 'hidden'} sm:block`}
-                >
-                    <p className="mb-2 text-sm font-medium">PRICE RANGE</p>
-                    <div className="flex gap-2">
-                        <input
-                            value={minPrice}
-                            onChange={(e) => setMinPrice(e.target.value)}
-                            className="w-1/2 border border-gray-300 px-3 py-2 text-sm outline-none"
-                            placeholder="Min (vd: 100)"
-                        />
-                        <input
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(e.target.value)}
-                            className="w-1/2 border border-gray-300 px-3 py-2 text-sm outline-none"
-                            placeholder="Max (vd: 300)"
-                        />
-                    </div>
-                    <p className="mt-2 text-xs text-gray-500">
-                        Bạn có thể nhập <b>100</b> (tự hiểu 100k) hoặc{' '}
-                        <b>100.000</b>.
-                    </p>
-                </div>
-
-                {/* Bestseller */}
-                <div
-                    className={`border border-gray-300 p-4 mt-4 ${showFilter ? '' : 'hidden'} sm:block`}
-                >
-                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={onlyBestSeller}
-                            onChange={(e) =>
-                                setOnlyBestSeller(e.target.checked)
-                            }
-                        />
-                        Only Bestseller
-                    </label>
-                </div>
-
-                {/* Category */}
-                <div
-                    className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}
-                >
-                    <p className="mb-3 text-sm font-medium">CATEGORIES</p>
-                    <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Men"
-                                onChange={toggleCategory}
-                                checked={category.includes('Men')}
-                            />
-                            Men
-                        </label>
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Women"
-                                onChange={toggleCategory}
-                                checked={category.includes('Women')}
-                            />
-                            Women
-                        </label>
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Kids"
-                                onChange={toggleCategory}
-                                checked={category.includes('Kids')}
-                            />
-                            Kids
-                        </label>
-                    </div>
-                </div>
-
-                {/* SubCategory */}
-                <div
-                    className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}
-                >
-                    <p className="mb-3 text-sm font-medium">TYPE</p>
-                    <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Topwear"
-                                onChange={toggleSubCategory}
-                                checked={subCategory.includes('Topwear')}
-                            />
-                            Topwear
-                        </label>
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Bottomwear"
-                                onChange={toggleSubCategory}
-                                checked={subCategory.includes('Bottomwear')}
-                            />
-                            Bottomwear
-                        </label>
-                        <label className="flex gap-2 cursor-pointer">
-                            <input
-                                className="w-3"
-                                type="checkbox"
-                                value="Winterwear"
-                                onChange={toggleSubCategory}
-                                checked={subCategory.includes('Winterwear')}
-                            />
-                            Winterwear
-                        </label>
-                    </div>
-                </div>
-
-                {/* Clear all */}
-                <div className={`mt-4 ${showFilter ? '' : 'hidden'} sm:block`}>
-                    <button
-                        onClick={clearAll}
-                        className="w-full border border-gray-300 py-2 text-sm hover:bg-gray-100"
-                    >
-                        Clear all filters
-                    </button>
-                </div>
-            </div>
-
-            {/* ===== PRODUCT GRID ===== */}
-            <div className="flex-1">
-                <div className="flex justify-between items-end text-base sm:text-2xl mb-4">
+        <div className="space-y-6 py-4 sm:space-y-8 sm:py-6">
+            <section className="section-shell px-5 py-6 sm:px-8 sm:py-8">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div>
+                        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
+                            Refined discovery
+                        </p>
                         <Title text1={'ALL'} text2={'COLLECTIONS'} />
-                        <p className="text-sm text-gray-500 mt-1">
-                            {filteredAndSorted.length} sản phẩm
+                        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+                            Bộ sưu tập được trình bày rõ ràng hơn với lọc nhanh, sắp xếp trực quan và trải nghiệm duyệt sản phẩm mượt mà trên mọi kích thước màn hình.
                         </p>
                     </div>
 
-                    <select
-                        value={sortType}
-                        onChange={(e) => setSortType(e.target.value)}
-                        className="border-2 border-gray-300 text-sm px-2 py-1"
-                    >
-                        <option value="relavent">Sort by: Relavent</option>
-                        <option value="low-high">Sort by: Low to High</option>
-                        <option value="high-low">Sort by: High to Low</option>
-                        <option value="newest">Sort by: Newest</option>
-                        <option value="name-az">Sort by: Name A-Z</option>
-                        <option value="name-za">Sort by: Name Z-A</option>
-                    </select>
-                </div>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                        <button
+                            onClick={() => setShowFilter((prev) => !prev)}
+                            className="inline-flex items-center justify-center rounded-full border border-[var(--border)] px-5 py-3 text-sm font-semibold tracking-[0.14em] text-slate-600 hover:bg-slate-900 hover:text-white lg:hidden"
+                            type="button"
+                        >
+                            {showFilter ? 'Hide Filters' : 'Show Filters'}
+                        </button>
 
-                {displayed.length === 0 ? (
-                    <div className="border border-gray-200 p-6 text-gray-600">
-                        Không tìm thấy sản phẩm phù hợp 😢
+                        <select
+                            value={sortType}
+                            onChange={(e) => setSortType(e.target.value)}
+                            className="rounded-full border border-[var(--border)] bg-white px-5 py-3 text-sm font-medium text-slate-600 outline-none"
+                        >
+                            <option value="relavent">Sort by: Relavent</option>
+                            <option value="low-high">Sort by: Low to High</option>
+                            <option value="high-low">Sort by: High to Low</option>
+                            <option value="newest">Sort by: Newest</option>
+                            <option value="name-az">Sort by: Name A-Z</option>
+                            <option value="name-za">Sort by: Name Z-A</option>
+                        </select>
                     </div>
-                ) : (
-                    <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-                            {displayed.map((item, index) => (
-                                <ProductItem
-                                    key={item._id ?? index}
-                                    name={item.name}
-                                    id={item._id}
-                                    price={item.price}
-                                    image={item.image}
-                                />
-                            ))}
+                </div>
+            </section>
+
+            <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
+                <aside className={`${showFilter ? 'block' : 'hidden'} lg:block`}>
+                    <div className="section-shell h-fit p-5 lg:sticky lg:top-[140px] lg:p-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                    Filters
+                                </p>
+                                <h2 className="display-font mt-2 text-2xl font-semibold text-slate-900">
+                                    Narrow your style
+                                </h2>
+                            </div>
+
+                            <button
+                                onClick={clearAll}
+                                className="text-sm font-semibold text-slate-500 hover:text-slate-900"
+                                type="button"
+                            >
+                                Clear all
+                            </button>
                         </div>
 
-                        {hasMore && (
-                            <div className="flex justify-center mt-8">
-                                <button
-                                    onClick={() =>
-                                        setVisibleCount((v) => v + STEP)
-                                    }
-                                    className="border border-gray-300 px-6 py-2 text-sm hover:bg-gray-100"
-                                >
-                                    Load more
-                                </button>
+                        <div className="mt-6 space-y-4">
+                            <div className="rounded-[24px] border border-[var(--border)] bg-white p-4">
+                                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Price Range
+                                </p>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <input
+                                        value={minPrice}
+                                        onChange={(e) => setMinPrice(e.target.value)}
+                                        className="rounded-2xl border border-[var(--border)] px-4 py-3 text-sm outline-none"
+                                        placeholder="Min"
+                                    />
+                                    <input
+                                        value={maxPrice}
+                                        onChange={(e) => setMaxPrice(e.target.value)}
+                                        className="rounded-2xl border border-[var(--border)] px-4 py-3 text-sm outline-none"
+                                        placeholder="Max"
+                                    />
+                                </div>
+
+                                <p className="mt-3 text-xs leading-6 text-slate-400">
+                                    Bạn có thể nhập <b>100</b> hoặc <b>100.000</b>.
+                                </p>
                             </div>
-                        )}
-                    </>
-                )}
+
+                            <div className="rounded-[24px] border border-[var(--border)] bg-white p-4">
+                                <label className="flex items-center gap-3 text-sm font-medium text-slate-600">
+                                    <input
+                                        type="checkbox"
+                                        checked={onlyBestSeller}
+                                        onChange={(e) =>
+                                            setOnlyBestSeller(e.target.checked)
+                                        }
+                                    />
+                                    Only Bestseller
+                                </label>
+                            </div>
+
+                            <div className="rounded-[24px] border border-[var(--border)] bg-white p-4">
+                                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Categories
+                                </p>
+
+                                <div className="space-y-3 text-sm text-slate-600">
+                                    {['Men', 'Women', 'Kids'].map((item) => (
+                                        <label key={item} className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                value={item}
+                                                onChange={toggleCategory}
+                                                checked={category.includes(item)}
+                                            />
+                                            {item}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="rounded-[24px] border border-[var(--border)] bg-white p-4">
+                                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                    Type
+                                </p>
+
+                                <div className="space-y-3 text-sm text-slate-600">
+                                    {['Topwear', 'Bottomwear', 'Winterwear'].map((item) => (
+                                        <label key={item} className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                value={item}
+                                                onChange={toggleSubCategory}
+                                                checked={subCategory.includes(item)}
+                                            />
+                                            {item}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <section className="space-y-5">
+                    <div className="section-shell px-5 py-5 sm:px-6">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                    Products found
+                                </p>
+                                <p className="mt-2 text-sm text-slate-500 sm:text-base">
+                                    {filteredAndSorted.length} sản phẩm phù hợp với lựa chọn hiện tại.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={clearAll}
+                                className="hidden rounded-full border border-[var(--border)] px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-900 hover:text-white lg:inline-flex"
+                                type="button"
+                            >
+                                Reset Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    {displayed.length === 0 ? (
+                        <div className="section-shell px-6 py-12 text-center">
+                            <p className="text-lg font-semibold text-slate-900">
+                                Không tìm thấy sản phẩm phù hợp
+                            </p>
+                            <p className="mt-3 text-sm leading-7 text-slate-500">
+                                Thử nới rộng khoảng giá, bỏ bớt bộ lọc hoặc xóa từ khóa tìm kiếm để xem thêm lựa chọn.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+                                {displayed.map((item, index) => (
+                                    <ProductItem
+                                        key={item._id ?? index}
+                                        name={item.name}
+                                        id={item._id}
+                                        price={item.price}
+                                        image={item.image}
+                                    />
+                                ))}
+                            </div>
+
+                            {hasMore && (
+                                <div className="flex justify-center pt-2">
+                                    <button
+                                        onClick={() => setVisibleCount((v) => v + STEP)}
+                                        className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_18px_36px_rgba(15,23,42,0.16)] hover:-translate-y-0.5 hover:bg-slate-800"
+                                        type="button"
+                                    >
+                                        Load More
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </section>
             </div>
         </div>
     );

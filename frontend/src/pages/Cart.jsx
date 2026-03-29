@@ -1,4 +1,4 @@
-﻿import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
@@ -28,7 +28,6 @@ const Cart = () => {
 
     const [cartData, setCartData] = useState([]);
 
-    // CHANGE: chuyen cart object -> list de render
     useEffect(() => {
         const tempData = [];
 
@@ -49,122 +48,131 @@ const Cart = () => {
     }, [cartItems]);
 
     return (
-        <div className="border-t pt-14">
-            <div className="text-2xl mb-3">
+        <div className="space-y-6 py-4 sm:space-y-8 sm:py-6">
+            <div className="section-shell px-5 py-6 sm:px-8 sm:py-8">
                 <Title text1={'YOUR'} text2={'CART'} />
             </div>
 
-            <div>
-                {cartData.length === 0 ? (
-                    <p className="text-gray-500 text-center py-10">Gio hang trong</p>
-                ) : (
-                    cartData.map((item, index) => {
-                        const productData = products.find(
-                            (p) => String(p._id ?? p.id) === String(item._id),
-                        );
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+                <section className="space-y-4">
+                    {cartData.length === 0 ? (
+                        <div className="section-shell px-6 py-12 text-center">
+                            <p className="text-xl font-semibold text-slate-900">Giỏ hàng trống</p>
+                            <p className="mt-3 text-sm leading-7 text-slate-500">
+                                Hãy thêm một vài sản phẩm để tiếp tục mua sắm với trải nghiệm checkout mới.
+                            </p>
+                        </div>
+                    ) : (
+                        cartData.map((item, index) => {
+                            const productData = products.find(
+                                (p) => String(p._id ?? p.id) === String(item._id),
+                            );
 
-                        if (!productData) return null;
+                            if (!productData) return null;
 
-                        const imageSrc = getSafeImage(productData.image);
-                        const availableSizes =
-                            Array.isArray(productData.sizes) &&
-                            productData.sizes.length > 0
-                                ? productData.sizes
-                                : ['Free'];
+                            const imageSrc = getSafeImage(productData.image);
+                            const availableSizes =
+                                Array.isArray(productData.sizes) &&
+                                productData.sizes.length > 0
+                                    ? productData.sizes
+                                    : ['Free'];
 
-                        // CHANGE: neu size trong cart cu khong con hop le thi hien size co ban
-                        const displaySize = availableSizes.includes(item.size)
-                            ? item.size
-                            : availableSizes[0];
+                            const displaySize = availableSizes.includes(item.size)
+                                ? item.size
+                                : availableSizes[0];
 
-                        return (
-                            <div
-                                key={`${item._id}-${item.size}-${index}`}
-                                className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
-                            >
-                                <div className="flex items-start gap-6">
-                                    <img
-                                        className="w-16 sm:w-20"
-                                        src={imageSrc}
-                                        alt={productData.name}
-                                    />
+                            return (
+                                <article
+                                    key={`${item._id}-${item.size}-${index}`}
+                                    className="section-shell flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
+                                >
+                                    <div className="flex items-start gap-4 sm:gap-5">
+                                        <img
+                                            className="h-24 w-20 rounded-[20px] object-cover"
+                                            src={imageSrc}
+                                            alt={productData.name}
+                                        />
 
-                                    <div>
-                                        <p className="text-xs sm:text-lg font-medium">
-                                            {productData.name}
-                                        </p>
-
-                                        <div className="flex items-center gap-5 mt-2">
-                                            {/* CHANGE: format gia dong nhat */}
-                                            <p>{formatVndPrice(productData.price)}</p>
-                                            <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
-                                                {displaySize}
+                                        <div>
+                                            <p className="text-base font-semibold text-slate-900 sm:text-lg">
+                                                {productData.name}
                                             </p>
+
+                                            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                                                <p>{formatVndPrice(productData.price)}</p>
+                                                <p className="rounded-full border border-[var(--border)] bg-white px-3 py-1">
+                                                    Size {displaySize}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <input
-                                    onChange={(e) => {
-                                        const val = Number(e.target.value);
-                                        if (val <= 0 || e.target.value === '') {
-                                            removeFromCart(item._id, item.size);
-                                        } else {
-                                            updateCartQty(item._id, item.size, val);
-                                        }
-                                    }}
-                                    className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
-                                    type="number"
-                                    min={0}
-                                    value={item.quantity}
-                                />
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        <input
+                                            onChange={(e) => {
+                                                const val = Number(e.target.value);
+                                                if (val <= 0 || e.target.value === '') {
+                                                    removeFromCart(item._id, item.size);
+                                                } else {
+                                                    updateCartQty(item._id, item.size, val);
+                                                }
+                                            }}
+                                            className="w-20 rounded-full border border-[var(--border)] px-4 py-3 text-center text-sm outline-none"
+                                            type="number"
+                                            min={0}
+                                            value={item.quantity}
+                                        />
 
-                                <img
-                                    onClick={() => removeFromCart(item._id, item.size)}
-                                    className="w-4 mr-4 sm:w-5 cursor-pointer"
-                                    src={assets.bin_icon}
-                                    alt="Xoa"
-                                />
-                            </div>
-                        );
-                    })
-                )}
-            </div>
+                                        <button
+                                            onClick={() => removeFromCart(item._id, item.size)}
+                                            className="rounded-full border border-[var(--border)] p-3 hover:bg-slate-900"
+                                            type="button"
+                                        >
+                                            <img
+                                                className="w-4"
+                                                src={assets.bin_icon}
+                                                alt="Xoa"
+                                            />
+                                        </button>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    )}
+                </section>
 
-            <div className="flex justify-end my-20">
-                <div className="w-full sm:w-[450px]">
-                    <div className="w-full">
-                        <div className="text-2xl">
-                            <Title text1={'CART'} text2={'TOTALS'} />
-                        </div>
+                <aside className="lg:sticky lg:top-[140px] lg:h-fit">
+                    <div className="section-shell p-6 sm:p-7">
+                        <Title text1={'CART'} text2={'TOTALS'} />
 
-                        <div className="flex flex-col gap-2 mt-2 text-sm">
+                        <div className="mt-6 space-y-4 text-sm text-slate-600">
                             <div className="flex justify-between">
                                 <p>Subtotal</p>
                                 <p>{formatVndPrice(getCartAmount())}</p>
                             </div>
-                            <hr />
+
                             <div className="flex justify-between">
                                 <p>Shipping Fee</p>
                                 <p>{formatVndPrice(delivery_fee)}</p>
                             </div>
-                            <hr />
-                            <div className="flex justify-between font-bold text-base">
-                                <p>Total</p>
-                                <p>{formatVndPrice(getCartAmount() + delivery_fee)}</p>
+
+                            <div className="rounded-[22px] bg-slate-900 px-5 py-4 text-base font-semibold text-white">
+                                <div className="flex justify-between">
+                                    <p>Total</p>
+                                    <p>{formatVndPrice(getCartAmount() + delivery_fee)}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="w-full text-end">
-                            <button
-                                onClick={() => navigate('/place-order')}
-                                className="bg-black text-white text-sm my-8 px-8 py-3"
-                            >
-                                PROCEED TO CHECKOUT
-                            </button>
-                        </div>
+                        <button
+                            onClick={() => navigate('/place-order')}
+                            className="mt-6 w-full rounded-full bg-slate-900 px-6 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_18px_36px_rgba(15,23,42,0.16)] hover:-translate-y-0.5 hover:bg-slate-800"
+                            type="button"
+                        >
+                            Proceed To Checkout
+                        </button>
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
     );

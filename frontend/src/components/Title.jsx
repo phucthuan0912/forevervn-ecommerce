@@ -1,10 +1,10 @@
 const Title = ({ text1, text2 }) => {
   return (
-    <div className="inline-flex gap-2 items-center mb-3">
-      <p className="text-gray-500">
-        {text1} <span className="text-gray-700 font-medium">{text2}</span>
+    <div className="inline-flex flex-wrap items-center gap-3">
+      <p className="display-font text-2xl font-semibold tracking-[-0.04em] text-slate-400 sm:text-3xl">
+        {text1} <span className="text-slate-900">{text2}</span>
       </p>
-      <p className="w-8 sm:w-12 h-[1px] sm:h-[2px] bg-gray-700" />
+      <span className="h-px w-10 rounded-full bg-slate-300 sm:w-14" />
     </div>
   );
 };

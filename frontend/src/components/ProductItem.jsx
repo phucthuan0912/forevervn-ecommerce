@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function formatVndPrice(price) {
     const n = Number(price);
@@ -7,23 +7,44 @@ function formatVndPrice(price) {
 }
 
 const ProductItem = ({ id, image, name, price }) => {
-    // CHANGE: lay anh an toan cho ca image array va image string
     const imageSrc = Array.isArray(image)
         ? image[0]
         : image || 'https://dummyimage.com/600x800/e5e7eb/6b7280&text=No+Image';
 
     return (
-        <Link className="text-gray-700 cursor-pointer" to={`/product/${id}`}>
-            <div className="overflow-hidden">
-                <img
-                    className="hover:scale-110 transition ease-in-out w-full"
-                    src={imageSrc}
-                    alt={name}
-                />
-            </div>
-            <p className="pt-3 pb-1 text-sm">{name}</p>
-            {/* CHANGE: format gia thong nhat */}
-            <p className="text-sm font-medium">{formatVndPrice(price)}</p>
+        <Link
+            className="group block cursor-pointer text-slate-700"
+            to={`/product/${id}`}
+        >
+            <article className="section-shell h-full overflow-hidden rounded-[24px] border-white/70 bg-white/90">
+                <div className="overflow-hidden bg-slate-50">
+                    <img
+                        className="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                        src={imageSrc}
+                        alt={name}
+                    />
+                </div>
+
+                <div className="space-y-3 p-4 sm:p-5">
+                    <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                        Forever Collection
+                    </p>
+
+                    <div className="flex items-start justify-between gap-4">
+                        <p className="text-sm font-semibold leading-6 text-slate-800 sm:text-base">
+                            {name}
+                        </p>
+
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 transition duration-300 group-hover:bg-slate-900 group-hover:text-white">
+                            View
+                        </span>
+                    </div>
+
+                    <p className="text-sm font-semibold text-slate-900 sm:text-base">
+                        {formatVndPrice(price)}
+                    </p>
+                </div>
+            </article>
         </Link>
     );
 };

@@ -16,15 +16,15 @@ const RelatedProducts = ({ category, subCategory }) => {
 
             setRelated(productsCopy.slice(0, 5));
         }
-    }, [products]);
+    }, [category, products, subCategory]);
 
     return (
-        <div className='my-24'>
-            <div className='text-center text-3xl py-2'>
+        <section className='py-10 sm:py-14'>
+            <div className='mb-8 text-center sm:mb-10'>
                 <Title text1={'RELATED'} text2={'PRODUCTS'} />
             </div>
 
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6'>
+            <div className='grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-5'>
                 {related.map((item, index) => (
                     <ProductItem
                         key={index}
@@ -35,7 +35,7 @@ const RelatedProducts = ({ category, subCategory }) => {
                     />
                 ))}
             </div>
-        </div>
+        </section>
     )
 }
 

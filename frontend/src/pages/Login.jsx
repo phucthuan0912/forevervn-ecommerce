@@ -1,7 +1,7 @@
-﻿import React, { useContext, useEffect, useState } from 'react';
-import { ShopContext } from '../context/ShopContext';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { ShopContext } from '../context/ShopContext';
 
 const Login = () => {
     const [currentState, setCurrentState] = useState('Sign Up');
@@ -12,7 +12,6 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // CHANGE: dong bo token context tu localStorage neu da dang nhap truoc do
     useEffect(() => {
         const savedToken = localStorage.getItem('token');
         if (!token && savedToken) {
@@ -20,7 +19,6 @@ const Login = () => {
         }
     }, [token, setToken]);
 
-    // CHANGE: da co token thi quay ve trang chu
     useEffect(() => {
         if (token) {
             navigate('/');
@@ -79,81 +77,125 @@ const Login = () => {
     };
 
     return (
-        <form
-            onSubmit={onSubmitHandler}
-            className="flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800"
-        >
-            <div className="inline-flex items-center gap-2 mb-2 mt-10">
-                <p className="prata-regular text-3xl">{currentState}</p>
-                <hr className="border-none h-[1.5px] w-8 bg-gray-800" />
-            </div>
+        <div className="py-4 sm:py-6">
+            <section className="section-shell overflow-hidden">
+                <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
+                    <div className="bg-[linear-gradient(180deg,#fdfbf6_0%,#edf4fb_100%)] px-6 py-8 sm:px-8 sm:py-10">
+                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">
+                            Forever Account
+                        </p>
+                        <h1 className="display-font mt-4 text-4xl font-semibold tracking-[-0.05em] text-slate-900 sm:text-5xl">
+                            A cleaner way to shop.
+                        </h1>
+                        <p className="mt-4 max-w-md text-sm leading-7 text-slate-500 sm:text-base">
+                            Đăng nhập hoặc tạo tài khoản để theo dõi đơn hàng, lưu phiên mua sắm và tiếp tục checkout mượt mà trên mọi thiết bị.
+                        </p>
 
-            {currentState === 'Sign Up' && (
-                <input
-                    onChange={(e) => setName(e.target.value)}
-                    value={name}
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-800"
-                    placeholder="Name"
-                    required
-                />
-            )}
+                        <div className="mt-8 grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                            <div className="rounded-[22px] border border-[var(--border)] bg-white/80 p-4 text-sm text-slate-500">
+                                Real-time order sync
+                            </div>
+                            <div className="rounded-[22px] border border-[var(--border)] bg-white/80 p-4 text-sm text-slate-500">
+                                Faster checkout flow
+                            </div>
+                            <div className="rounded-[22px] border border-[var(--border)] bg-white/80 p-4 text-sm text-slate-500">
+                                Responsive shopping experience
+                            </div>
+                        </div>
+                    </div>
 
-            <input
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                type="email"
-                className="w-full px-3 py-2 border border-gray-800"
-                placeholder="Email"
-                required
-            />
-
-            <input
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-                type="password"
-                className="w-full px-3 py-2 border border-gray-800"
-                placeholder="Password"
-                required
-            />
-
-            <div className="w-full flex justify-between text-sm mt-[-8px]">
-                <p className="cursor-pointer">Forgot your password?</p>
-                {currentState === 'Login' ? (
-                    <p
-                        onClick={() => {
-                            setCurrentState('Sign Up');
-                            resetForm();
-                        }}
-                        className="cursor-pointer"
+                    <form
+                        onSubmit={onSubmitHandler}
+                        className="flex flex-col justify-center px-6 py-8 sm:px-8 sm:py-10"
                     >
-                        Create account
-                    </p>
-                ) : (
-                    <p
-                        onClick={() => {
-                            setCurrentState('Login');
-                            resetForm();
-                        }}
-                        className="cursor-pointer"
-                    >
-                        Login Here
-                    </p>
-                )}
-            </div>
+                        <div className="max-w-md">
+                            <div className="inline-flex items-center gap-3">
+                                <p className="display-font text-3xl font-semibold tracking-[-0.04em] text-slate-900">
+                                    {currentState}
+                                </p>
+                                <span className="h-px w-10 bg-slate-300" />
+                            </div>
 
-            <button
-                type="submit"
-                disabled={loading}
-                className="bg-black text-white font-light px-8 py-2 mt-4 disabled:opacity-60"
-            >
-                {loading
-                    ? 'Processing...'
-                    : currentState === 'Login'
-                      ? 'Sign In'
-                      : 'Sign Up'}
-            </button>
-        </form>
+                            <p className="mt-3 text-sm leading-7 text-slate-500">
+                                {currentState === 'Sign Up'
+                                    ? 'Tạo tài khoản mới để bắt đầu mua sắm nhanh hơn.'
+                                    : 'Đăng nhập để tiếp tục giỏ hàng và đơn hàng của bạn.'}
+                            </p>
+
+                            <div className="mt-8 space-y-4">
+                                {currentState === 'Sign Up' && (
+                                    <input
+                                        onChange={(e) => setName(e.target.value)}
+                                        value={name}
+                                        type="text"
+                                        className="w-full rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                                        placeholder="Name"
+                                        required
+                                    />
+                                )}
+
+                                <input
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={email}
+                                    type="email"
+                                    className="w-full rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                                    placeholder="Email"
+                                    required
+                                />
+
+                                <input
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={password}
+                                    type="password"
+                                    className="w-full rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none"
+                                    placeholder="Password"
+                                    required
+                                />
+                            </div>
+
+                            <div className="mt-4 flex justify-between gap-3 text-sm text-slate-500">
+                                <p className="cursor-pointer hover:text-slate-900">
+                                    Forgot your password?
+                                </p>
+                                {currentState === 'Login' ? (
+                                    <p
+                                        onClick={() => {
+                                            setCurrentState('Sign Up');
+                                            resetForm();
+                                        }}
+                                        className="cursor-pointer font-semibold text-slate-900"
+                                    >
+                                        Create account
+                                    </p>
+                                ) : (
+                                    <p
+                                        onClick={() => {
+                                            setCurrentState('Login');
+                                            resetForm();
+                                        }}
+                                        className="cursor-pointer font-semibold text-slate-900"
+                                    >
+                                        Login Here
+                                    </p>
+                                )}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="mt-8 rounded-full bg-slate-900 px-8 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_18px_36px_rgba(15,23,42,0.16)] hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-60"
+                            >
+                                {loading
+                                    ? 'Processing...'
+                                    : currentState === 'Login'
+                                      ? 'Sign In'
+                                      : 'Sign Up'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
     );
 };
 

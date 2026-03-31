@@ -1,5 +1,6 @@
 import orderModel from '../models/orderModel.js';
 import userModel from '../models/userModel.js';
+import logAction from '../utils/logger.js';
 
 const placeOrder = async (req, res) => {
     try {
@@ -83,6 +84,11 @@ const updateStatus = async (req, res) => {
         }
 
         await orderModel.findByIdAndUpdate(orderId, { status });
+        
+        if (req.adminEmail) {
+            await logAction(req.adminEmail, req.adminName, 'UPDATE_ORDER_STATUS', `Updated order #${orderId.slice(-8)} to ${status}`, orderId);
+        }
+        
         res.json({ success: true, message: 'Order status updated' });
     } catch (error) {
         console.log(error);
@@ -90,4 +96,57 @@ const updateStatus = async (req, res) => {
     }
 };
 
-export { placeOrder, allOrders, userOrders, updateStatus };
+const cancelOrder = async (req, res) => {
+    try {
+        const { userId, orderId } = req.body;
+
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return res.json({ success: false, message: 'Order not found' });
+        }
+
+        // Check if the order belongs to the requester
+        if (order.userId.toString() !== userId.toString()) {
+            return res.json({ success: false, message: 'Not authorized' });
+        }
+
+        const cancellableStatuses = ['Order Placed', 'Packing'];
+        if (!cancellableStatuses.includes(order.status)) {
+            return res.json({ success: false, message: `Cannot cancel order in ${order.status} status` });
+        }
+
+        await orderModel.findByIdAndUpdate(orderId, { status: 'Cancelled' });
+        
+        // Log user cancellation
+        await logAction(userId, 'Customer', 'CANCEL_ORDER', `Customer cancelled order #${orderId.slice(-8)}`, orderId);
+        
+        res.json({ success: true, message: 'Order cancelled successfully' });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+const deleteOrder = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        if (!orderId) {
+            return res.json({ success: false, message: 'Missing orderId' });
+        }
+
+        await orderModel.findByIdAndDelete(orderId);
+        
+        if (req.adminEmail) {
+            await logAction(req.adminEmail, req.adminName, 'DELETE_ORDER', `Permanently deleted order #${orderId.slice(-8)}`, orderId);
+        }
+        
+        res.json({ success: true, message: 'Order deleted successfully' });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { placeOrder, allOrders, userOrders, updateStatus, cancelOrder, deleteOrder };

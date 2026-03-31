@@ -9,6 +9,13 @@ import userRouter from './routes/userRouter.js';
 import productRouter from './routes/productRouter.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
+import systemRouter from './routes/systemRouter.js';
+import categoryRouter from './routes/categoryRouter.js';
+import subCategoryRouter from './routes/subCategoryRouter.js';
+import dashboardRouter from './routes/dashboardRouter.js';
+import auditLogRouter from './routes/auditLogRouter.js';
+import bannerRouter from './routes/bannerRoute.js';
+import reviewRouter from './routes/reviewRoute.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +35,13 @@ app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/system', systemRouter);
+app.use('/api/category', categoryRouter);
+app.use('/api/sub-category', subCategoryRouter);
+app.use('/api/dashboard', dashboardRouter);
+app.use('/api/audit-log', auditLogRouter);
+app.use('/api/banner', bannerRouter);
+app.use('/api/review-user', reviewRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World! API dang chay...');

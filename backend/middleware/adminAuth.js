@@ -16,6 +16,9 @@ const adminAuth = async (req, res, next) => {
             return res.json({ success: false, message: 'Not Authorized Login Again' });
         }
 
+        req.adminEmail = token_decode.email;
+        req.adminName = token_decode.email.split('@')[0]; // Simple name from email
+
         next();
 
     } catch (error) {

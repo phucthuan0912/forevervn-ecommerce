@@ -1,9 +1,11 @@
 import productModel from '../models/productModel.js';
 import { v2 as cloudinary } from 'cloudinary';
+import logAction from '../utils/logger.js';
+import { getTikTokHDLink } from '../utils/tiktok.js';
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
+        const { name, description, price, oldPrice, category, subCategory, sizes, colors, videoUrl, bestseller } = req.body;
 
         const image1 = req.files?.image1?.[0];
         const image2 = req.files?.image2?.[0];
@@ -42,13 +44,27 @@ const addProduct = async (req, res) => {
             return res.json({ success: false, message: 'Please select at least one size' });
         }
 
+        let parsedColors = [];
+        if (Array.isArray(colors)) {
+            parsedColors = colors;
+        } else if (typeof colors === 'string') {
+            try {
+                parsedColors = JSON.parse(colors);
+            } catch {
+                parsedColors = colors.replace(/^\[|\]$/g, '').split(/[,\s]+/).map(i => i.replace(/^"|"$/g, '').trim()).filter(Boolean);
+            }
+        }
+
         const productData = {
             name,
             description,
             price: Number(price),
+            oldPrice: Number(oldPrice) || 0,
             category,
             subCategory,
             sizes: parsedSizes,
+            colors: parsedColors,
+            videoUrl: getTikTokHDLink(videoUrl),
             bestseller: bestseller === 'true' ? true : false,
             image: imagesUrl,
             date: Date.now()
@@ -94,7 +110,7 @@ const listProducts = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { productId, name, description, price, category, subCategory, sizes, bestseller } = req.body;
+        const { productId, name, description, price, oldPrice, category, subCategory, sizes, colors, videoUrl, bestseller } = req.body;
 
         let parsedSizes = [];
         if (Array.isArray(sizes)) {
@@ -103,21 +119,31 @@ const updateProduct = async (req, res) => {
             try {
                 parsedSizes = JSON.parse(sizes);
             } catch {
-                parsedSizes = sizes
-                    .replace(/^\[|\]$/g, '')
-                    .split(/[,\s]+/)
-                    .map((item) => item.replace(/^"|"$/g, '').trim())
-                    .filter(Boolean);
+                parsedSizes = sizes.replace(/^\[|\]$/g, '').split(/[,\s]+/).map(i => i.replace(/^"|"$/g, '').trim()).filter(Boolean);
+            }
+        }
+        
+        let parsedColors = [];
+        if (Array.isArray(colors)) {
+            parsedColors = colors;
+        } else if (typeof colors === 'string') {
+            try {
+                parsedColors = JSON.parse(colors);
+            } catch {
+                parsedColors = colors.replace(/^\[|\]$/g, '').split(/[,\s]+/).map(i => i.replace(/^"|"$/g, '').trim()).filter(Boolean);
             }
         }
 
         const updateData = {};
         if (name) updateData.name = name;
         if (description) updateData.description = description;
-        if (price) updateData.price = Number(price);
+        if (price !== undefined) updateData.price = Number(price);
+        if (oldPrice !== undefined) updateData.oldPrice = Number(oldPrice);
         if (category) updateData.category = category;
         if (subCategory) updateData.subCategory = subCategory;
         if (parsedSizes.length) updateData.sizes = parsedSizes;
+        if (parsedColors.length) updateData.colors = parsedColors;
+        if (videoUrl !== undefined) updateData.videoUrl = getTikTokHDLink(videoUrl);
         if (bestseller !== undefined) updateData.bestseller = bestseller === 'true' || bestseller === true;
 
         const image1 = req.files?.image1?.[0];
@@ -138,6 +164,7 @@ const updateProduct = async (req, res) => {
         }
 
         await productModel.findByIdAndUpdate(productId, updateData);
+        await logAction(req.adminEmail, req.adminName, 'UPDATE_PRODUCT', `Updated product: ${name || productId}`, productId);
         res.json({ success: true, message: 'Product Updated' });
     } catch (error) {
         console.log(error);

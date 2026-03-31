@@ -4,10 +4,13 @@ const productSchema = new mongoose.Schema({
     name:        { type: String,  required: true },
     description: { type: String,  required: true },
     price:       { type: Number,  required: true },
+    oldPrice:    { type: Number,  default: 0 },
     image:       { type: Array,   required: true },
     category:    { type: String,  required: true },
     subCategory: { type: String,  required: true },
     sizes:       { type: Array,   required: true },
+    colors:      { type: Array,   default: []    }, // New: Array of color names/hex
+    videoUrl:    { type: String,  default: ""    }, // New: TikTok/Review video link
     bestseller:  { type: Boolean  },
     date:        { type: Number,  required: true },
 })

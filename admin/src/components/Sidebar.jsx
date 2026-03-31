@@ -1,14 +1,21 @@
 import React from 'react'
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
 import { Link, useLocation } from 'react-router-dom'
-import { PlusCircle, List, Package, LayoutDashboard, Users } from 'lucide-react'
+import { PlusCircle, List, Package, LayoutDashboard, Users, Ticket, Settings, Layers, History, ListTree, Image, MessageSquare } from 'lucide-react'
 
 const navItems = [
   { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard'  },
+  { to: '/categories', icon: <Layers size={18} />,          label: 'Categories' },
+  { to: '/sub-categories', icon: <ListTree size={18} />,    label: 'Sub-Categories' },
   { to: '/customers', icon: <Users size={18} />,           label: 'Customers'  },
+  { to: '/vouchers',  icon: <Ticket size={18} />,          label: 'Vouchers'   },
+  { to: '/settings',  icon: <Settings size={18} />,        label: 'Settings'   },
   { to: '/add',       icon: <PlusCircle size={18} />,      label: 'Add Items'  },
   { to: '/list',      icon: <List size={18} />,            label: 'List Items' },
   { to: '/orders',    icon: <Package size={18} />,         label: 'Orders'     },
+  { to: '/banners',   icon: <Image size={18} />,           label: 'Banners'    },
+  { to: '/reviews',   icon: <MessageSquare size={18} />,    label: 'Reviews'    },
+  { to: '/audit-logs', icon: <History size={18} />,         label: 'Audit Logs' },
 ]
 
 const SidebarComponent = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
@@ -11,12 +11,20 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
-  const [category, setCategory] = useState('Men')
-  const [subCategory, setSubCategory] = useState('Topwear')
+  const [oldPrice, setOldPrice] = useState('')
+  const [category, setCategory] = useState('') // CHANGE: empty by default
+  const [subCategory, setSubCategory] = useState('') // CHANGE: empty by default
   const [bestseller, setBestseller] = useState(false)
   const [sizes, setSizes] = useState([])
+  const [colors, setColors] = useState([])
+  const [videoUrl, setVideoUrl] = useState('')
   const [customSize, setCustomSize] = useState('')
+  const [customColor, setCustomColor] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const [categories, setCategories] = useState([])
+  const [subCategories, setSubCategories] = useState([])
+  const [allSubCategories, setAllSubCategories] = useState([])
 
   const apiBaseUrl = useMemo(
     () => (backendUrlFromProps || defaultBackendUrl || '').trim().replace(/\/+$/, ''),
@@ -78,16 +86,77 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
     setCustomSize('')
   }
 
+  const toggleColor = (color) => {
+    const formattedColor = color.trim()
+    if (!formattedColor) return
+    setColors(prev => 
+      prev.includes(formattedColor) ? prev.filter(item => item !== formattedColor) : [...prev, formattedColor]
+    )
+  }
+
+  const addCustomColor = () => {
+    const color = customColor.trim()
+    if (!color) return
+    if (!colors.includes(color)) {
+      setColors(prev => [...prev, color])
+    }
+    setCustomColor('')
+  }
+
+  const fetchCategoryData = useCallback(async () => {
+    try {
+      const [catRes, subRes] = await Promise.all([
+        axios.get(`${apiBaseUrl}/api/category/list`),
+        axios.get(`${apiBaseUrl}/api/sub-category/list`)
+      ])
+      
+      if (catRes.data.success) {
+        const activeCats = catRes.data.categories.filter(c => c.status)
+        setCategories(activeCats)
+        // CHANGE: set default if current category is not in the list
+        if (activeCats.length > 0 && !activeCats.find(c => c.name === category)) {
+          setCategory(activeCats[0].name)
+        }
+      }
+      
+      if (subRes.data.success) {
+        setAllSubCategories(subRes.data.subCategories.filter(s => s.status))
+      }
+    } catch (error) {
+       console.error("Error fetching category data:", error)
+    }
+  }, [apiBaseUrl])
+
+  useEffect(() => {
+    fetchCategoryData()
+  }, [fetchCategoryData])
+
+  useEffect(() => {
+    const parent = categories.find(c => c.name === category)
+    if (parent) {
+      const filtered = allSubCategories.filter(s => s.categoryId?._id === parent._id)
+      setSubCategories(filtered)
+      if (filtered.length > 0) setSubCategory(filtered[0].name)
+      else setSubCategory('')
+    }
+  }, [category, categories, allSubCategories])
+
   const resetForm = () => {
     setImages([null, null, null, null])
     setName('')
     setDescription('')
     setPrice('')
-    setCategory('Men')
-    setSubCategory('Topwear')
+    setOldPrice('')
+    // CHANGE: keep current or set first active
+    if (categories.length > 0) {
+      setCategory(categories[0].name)
+    }
     setBestseller(false)
     setSizes([])
+    setColors([])
+    setVideoUrl('')
     setCustomSize('')
+    setCustomColor('')
   }
 
   const onSubmitHandler = async (event) => {
@@ -127,10 +196,13 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
       formData.append('name', name.trim())
       formData.append('description', description.trim())
       formData.append('price', numericPrice)
+      formData.append('oldPrice', Number(oldPrice) || 0)
       formData.append('category', category)
       formData.append('subCategory', subCategory)
       formData.append('bestseller', bestseller)
       formData.append('sizes', JSON.stringify(sizes))
+      formData.append('colors', JSON.stringify(colors))
+      formData.append('videoUrl', videoUrl)
 
       images.forEach((file, index) => {
         if (file) {
@@ -255,9 +327,9 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             onChange={(event) => setCategory(event.target.value)}
             className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none'
           >
-            <option value='Men'>Men</option>
-            <option value='Women'>Women</option>
-            <option value='Kids'>Kids</option>
+            {categories.map(cat => (
+              <option key={cat._id} value={cat.name}>{cat.name}</option>
+            ))}
           </select>
         </div>
 
@@ -268,14 +340,18 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             onChange={(event) => setSubCategory(event.target.value)}
             className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none'
           >
-            <option value='Topwear'>Topwear</option>
-            <option value='Bottomwear'>Bottomwear</option>
-            <option value='Winterwear'>Winterwear</option>
+            {subCategories.length > 0 ? (
+                subCategories.map(sub => (
+                    <option key={sub._id} value={sub.name}>{sub.name}</option>
+                ))
+            ) : (
+                <option value="">No sub-category</option>
+            )}
           </select>
         </div>
 
         <div className='min-w-[120px] flex-1'>
-          <p className='mb-2 font-medium'>Price</p>
+          <p className='mb-2 font-medium'>Sell Price</p>
           <input
             value={price}
             onChange={(event) => setPrice(event.target.value)}
@@ -286,6 +362,72 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             required
           />
         </div>
+
+        <div className='min-w-[120px] flex-1'>
+          <p className='mb-2 font-medium text-gray-400'>Original Price (Optional)</p>
+          <input
+            value={oldPrice}
+            onChange={(event) => setOldPrice(event.target.value)}
+            className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-pink-400 text-gray-500'
+            type='number'
+            placeholder='300000'
+            min={0}
+          />
+        </div>
+      </div>
+
+      <div className='w-full max-w-[500px]'>
+        <p className='mb-2 font-medium'>Product Colors</p>
+        <div className='mb-2 flex gap-2'>
+          <input
+            value={customColor}
+            onChange={(event) => setCustomColor(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                addCustomColor()
+              }
+            }}
+            className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-pink-400'
+            type='text'
+            placeholder='Add color: Black, Red, #FF0000...'
+          />
+          <button
+            type='button'
+            onClick={addCustomColor}
+            className='rounded border border-pink-400 px-4 py-2 text-sm font-medium text-pink-500 hover:bg-pink-50'
+          >
+            Add
+          </button>
+        </div>
+        <div className='flex flex-wrap gap-2'>
+          {colors.length ? (
+            colors.map((color) => (
+              <button
+                key={color}
+                type='button'
+                onClick={() => toggleColor(color)}
+                className='rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs font-medium text-pink-600'
+              >
+                {color} x
+              </button>
+            ))
+          ) : (
+            <span className='text-xs text-gray-500'>No colors selected</span>
+          )}
+        </div>
+      </div>
+
+      <div className='w-full max-w-[500px]'>
+        <p className='mb-2 font-medium'>TikTok Video URL (Review)</p>
+        <input
+          value={videoUrl}
+          onChange={(event) => setVideoUrl(event.target.value)}
+          className='w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-pink-400'
+          type='text'
+          placeholder='https://www.tiktok.com/@user/video/...'
+        />
+        <p className='text-[10px] text-gray-400 mt-1'>He thong se tu dong lay link HD khong logo.</p>
       </div>
 
       <div className='w-full max-w-[500px]'>

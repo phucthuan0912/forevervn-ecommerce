@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 import { backendUrl as defaultBackendUrl } from '../config'
 
-const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for Delivery', 'Delivered']
+const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled']
 const REFRESH_INTERVAL_MS = 10000
 
 const STATUS_STYLES = {
@@ -13,12 +13,14 @@ const STATUS_STYLES = {
   Shipped: 'border-violet-200 bg-violet-50 text-violet-700',
   'Out for Delivery': 'border-orange-200 bg-orange-50 text-orange-700',
   Delivered: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Cancelled: 'border-rose-200 bg-rose-50 text-rose-700',
 }
 
 const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
 
   const currencyFormatter = useMemo(
     () =>
@@ -142,18 +144,57 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
     }
   }
 
+  const handleDeleteOrder = async (orderId) => {
+    if (!orderId || !apiBaseUrl || !token) return
+    
+    if (!window.confirm('Bạn có chắc chắn muốn xoá vĩnh viễn đơn hàng này không?')) return
+
+    try {
+      setLoading(true)
+      const { data } = await axios.post(
+        `${apiBaseUrl}/api/order/delete`,
+        { orderId },
+        { headers: { token } }
+      )
+
+      if (data?.success) {
+        toast.success(data.message || 'Đã xoá đơn hàng')
+        fetchOrders({ silent: true })
+      } else {
+        toast.error(data?.message || 'Không thể xoá đơn hàng')
+      }
+    } catch (error) {
+      toast.error(error.message || 'Lỗi khi xoá đơn hàng')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const visibleOrders = useMemo(
-    () => [...orders].sort((a, b) => (Number(b?.date) || 0) - (Number(a?.date) || 0)),
-    [orders],
+    () => {
+      let filtered = [...orders]
+      if (statusFilter !== 'All') {
+        filtered = filtered.filter(order => order.status === statusFilter)
+      }
+      return filtered.sort((a, b) => (Number(b?.date) || 0) - (Number(a?.date) || 0))
+    },
+    [orders, statusFilter],
   )
 
   const formatCustomerName = (address = {}) =>
-    [address?.firstName, address?.lastName].filter(Boolean).join(' ') || 'Unknown customer'
+     address?.fullName || [address?.firstName, address?.lastName].filter(Boolean).join(' ') || 'Unknown customer'
 
-  const formatAddress = (address = {}) =>
-    [address?.street, address?.city, address?.state, address?.country, address?.zipcode]
-      .filter(Boolean)
-      .join(', ')
+  const formatAddress = (address = {}) => {
+    // Street includes Ward and Detail house number in old logic, 
+    // New logic uses province, district, ward, addressDetail
+    if (address?.province) {
+        return [address?.addressDetail, address?.ward, address?.district, address?.province]
+          .filter(Boolean)
+          .join(', ')
+    }
+    const parts = [address?.street, address?.city, address?.state];
+    return parts.filter(Boolean).join(', ') || 'No address provided';
+  }
 
   const getItemCount = (items = []) =>
     items.reduce((total, item) => total + (Number(item?.quantity) || 0), 0)
@@ -169,13 +210,26 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
           <p className='text-sm text-gray-500'>Admin and frontend sync order status from the database every 10 seconds.</p>
         </div>
 
-        <button
-          onClick={() => fetchOrders()}
-          disabled={loading}
-          className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-60'
-        >
-          {loading ? 'Loading...' : 'Refresh orders'}
-        </button>
+        <div className='flex flex-wrap items-center gap-3'>
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className='rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 outline-none transition-colors focus:border-rose-300'
+          >
+            <option value="All">All Statuses</option>
+            {ORDER_STATUSES.map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => fetchOrders()}
+            disabled={loading}
+            className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-60'
+          >
+            {loading ? 'Loading...' : 'Refresh orders'}
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -216,9 +270,15 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
 
                   <div className='space-y-1 text-sm text-gray-600'>
                     {(Array.isArray(order?.items) ? order.items : []).map((item, itemIndex) => (
-                      <p key={`${orderId}-${item?._id || item?.name || 'item'}-${itemIndex}`}>
-                        {item?.name || 'Product'} x {Number(item?.quantity) || 0}
-                        {item?.size ? ` (${item.size})` : ''}
+                      <p key={`${orderId}-${item?._id || item?.name || 'item'}-${itemIndex}`} className='flex items-center gap-1.5 flex-wrap'>
+                        <span>{item?.name || 'Product'} x {Number(item?.quantity) || 0}</span>
+                        {item?.size && <span className='rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600'>Size: {item.size}</span>}
+                        {item?.color && (
+                          <span className='flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600'>
+                            <span className='inline-block h-2.5 w-2.5 rounded-full border border-gray-300' style={{ backgroundColor: item.color.toLowerCase() }} />
+                            {item.color}
+                          </span>
+                        )}
                       </p>
                     ))}
                   </div>
@@ -278,6 +338,15 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
                         ? 'Updating order status...'
                         : 'Changes are saved to the database and reflected on the frontend automatically.'}
                     </p>
+                    
+                    {order.status === 'Cancelled' && (
+                      <button
+                        onClick={() => handleDeleteOrder(orderId)}
+                        className='mt-3 w-full rounded-lg border border-rose-100 bg-rose-50/50 py-2.5 text-xs font-semibold uppercase tracking-wider text-rose-600 transition-all hover:bg-rose-600 hover:text-white'
+                      >
+                        Xoá vĩnh viễn
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

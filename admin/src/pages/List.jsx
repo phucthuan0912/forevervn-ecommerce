@@ -54,6 +54,7 @@ const List = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
           name: item?.name || '-',
           category: item?.category || '-',
           price: Number(item?.price || 0),
+          oldPrice: Number(item?.oldPrice || 0),
           image: normalizeImage(item?.image),
         })),
     [products],
@@ -159,9 +160,19 @@ const List = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                 </div>
               </div>
 
-              <span className='pr-3 font-medium text-gray-700'>{product.name}</span>
+              <span className='pr-3 font-medium text-gray-700'>
+                {product.name}
+                {product.oldPrice > product.price && (
+                  <span className='ml-2 inline-block rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600'>SALE</span>
+                )}
+              </span>
               <span className='text-gray-600'>{product.category}</span>
-              <span className='font-semibold text-emerald-700'>{currencyFormatter.format(product.price)}</span>
+              <div className='flex flex-col'>
+                <span className='font-semibold text-emerald-700'>{currencyFormatter.format(product.price)}</span>
+                {product.oldPrice > product.price && (
+                  <span className='text-[10px] text-gray-400 line-through'>{currencyFormatter.format(product.oldPrice)}</span>
+                )}
+              </div>
 
               <div className='flex items-center justify-center gap-1'>
                 <button

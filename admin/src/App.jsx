@@ -4,14 +4,22 @@ import Sidebar from './components/Sidebar'
 import Login from './components/Login'
 import Dashboard from './pages/Dashboard'
 import Customers from './pages/Customers'
+import Vouchers from './pages/Vouchers'
+import Settings from './pages/Settings'
 import Add from './pages/Add'
 import List from './pages/List'
 import Orders from './pages/Orders'
 import Update from './pages/Update'
+import Categories from './pages/Categories'
+import SubCategories from './pages/SubCategories'
+import AuditLogs from './pages/AuditLogs'
+import Banners from './pages/Banners'
+import Reviews from './pages/Reviews'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { backendUrl } from './config'
+
 
 const App = () => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || '')
@@ -46,10 +54,17 @@ const App = () => {
             <Route path='/' element={<Navigate to='/dashboard' replace />} />
             <Route path='/dashboard' element={<Dashboard token={token} backendUrl={backendUrl} />} />
             <Route path='/customers' element={<Customers token={token} setToken={setToken} backendUrl={backendUrl} />} />
+            <Route path='/vouchers' element={<Vouchers token={token} setToken={setToken} backendUrl={backendUrl} />} />
+            <Route path='/settings' element={<Settings token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/add' element={<Add token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/update/:id' element={<Update token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/list' element={<List token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/orders' element={<Orders token={token} backendUrl={backendUrl} />} />
+            <Route path='/categories' element={<Categories token={token} backendUrl={backendUrl} />} />
+            <Route path='/sub-categories' element={<SubCategories token={token} backendUrl={backendUrl} />} />
+            <Route path='/audit-logs' element={<AuditLogs token={token} backendUrl={backendUrl} />} />
+            <Route path='/banners' element={<Banners token={token} backendUrl={backendUrl} />} />
+            <Route path='/reviews' element={<Reviews token={token} backendUrl={backendUrl} />} />
             <Route path='*' element={<Navigate to='/dashboard' replace />} />
           </Routes>
         </div>

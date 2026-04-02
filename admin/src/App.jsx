@@ -4,6 +4,9 @@ import Sidebar from './components/Sidebar'
 import Login from './components/Login'
 import Dashboard from './pages/Dashboard'
 import Customers from './pages/Customers'
+import Employees from './pages/Employees'
+import ImportBatch from './pages/ImportBatch'
+import BulkOperation from './pages/BulkOperation'
 import Vouchers from './pages/Vouchers'
 import Settings from './pages/Settings'
 import Add from './pages/Add'
@@ -23,6 +26,8 @@ import { backendUrl } from './config'
 
 const App = () => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || '')
+  
+  // Custom hook hoặc state track role (Nên có thêm setRole nhưng trong bài này Role query theo token base64 ở file sau)
 
   useEffect(() => {
     if (token) {
@@ -53,6 +58,9 @@ const App = () => {
           <Routes>
             <Route path='/' element={<Navigate to='/dashboard' replace />} />
             <Route path='/dashboard' element={<Dashboard token={token} backendUrl={backendUrl} />} />
+            <Route path='/employees' element={<Employees token={token} backendUrl={backendUrl} />} />
+            <Route path='/import-batch' element={<ImportBatch token={token} backendUrl={backendUrl} />} />
+            <Route path='/bulk-operation' element={<BulkOperation token={token} backendUrl={backendUrl} />} />
             <Route path='/customers' element={<Customers token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/vouchers' element={<Vouchers token={token} setToken={setToken} backendUrl={backendUrl} />} />
             <Route path='/settings' element={<Settings token={token} setToken={setToken} backendUrl={backendUrl} />} />

@@ -121,9 +121,66 @@ const List = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
     }
   }
 
+  const exportToCsv = async () => {
+    if (!apiBaseUrl || !token) return;
+
+    try {
+      const { data } = await axios.get(`${apiBaseUrl}/api/product/inventory`, {
+        headers: { token },
+        timeout: 20000,
+      });
+
+      if (!data.success || !data.inventory.length) {
+        toast.info('No inventory data to export');
+        return;
+      }
+
+      const headers = [
+        'Product Name',
+        'Category',
+        'Sub-Category',
+        'Size',
+        'Color',
+        'Total Stock',
+      ];
+
+      const rows = data.inventory.map(item => [
+        `"${item.productName}"`,
+        `"${item.category}"`,
+        `"${item.subCategory}"`,
+        `"${item.size}"`,
+        `"${item.color}"`,
+        item.totalStock,
+      ].join(','));
+
+      const csvContent = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `inventory_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Export failed';
+      if (handleUnauthorized(message)) return;
+      toast.error(message);
+    }
+  };
+
   return (
     <div className='w-full px-4 py-6 md:px-6'>
-      <p className='mb-4 text-xl font-semibold text-gray-800'>All Products List</p>
+      <div className='mb-4 flex items-center justify-between'>
+        <p className='text-xl font-semibold text-gray-800'>All Products List</p>
+        <button
+          onClick={() => exportToCsv()}
+          disabled={loading}
+          className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-500 disabled:cursor-not-allowed disabled:opacity-60'
+        >
+          Export to CSV
+        </button>
+      </div>
 
       <div className='w-full max-w-[1020px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm'>
         <div className='grid grid-cols-[90px_2fr_1fr_1fr_100px] items-center border-b border-gray-200 bg-gradient-to-r from-gray-50 via-white to-gray-50 px-4 py-3 text-[13px] font-semibold text-gray-700'>

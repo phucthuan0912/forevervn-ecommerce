@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { backendUrl as defaultBackendUrl } from '../config'
-import { DollarSign, ShoppingBag, Boxes, CircleCheckBig, Package, TrendingUp, PieChart as PieIcon } from 'lucide-react'
+import { DollarSign, ShoppingBag, Boxes, CircleCheckBig, Package, TrendingUp, PieChart as PieIcon, Download, HandCoins, Activity, Users, Clock, Database } from 'lucide-react'
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts'
 
@@ -84,35 +84,88 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
     fetchData()
   }, [fetchData])
 
+  const handleExport = useCallback(async () => {
+    if (!apiBaseUrl || !token) return;
+    try {
+      const response = await axios.get(`${apiBaseUrl}/api/dashboard/export-orders`, {
+        headers: { token },
+        responseType: 'blob' // Important for file download
+      });
+      
+      const url = window.URL.createObjectURL(new Blob(['\uFEFF' + response.data], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'DonHang_BaoCao.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Xuất báo cáo thành công!');
+    } catch (error) {
+       toast.error('Lỗi xuất báo cáo!');
+    }
+  }, [apiBaseUrl, token]);
+
   const totals = useMemo(() => {
     if (!stats) return []
     return [
       {
-        label: 'Total Revenue',
+        label: 'Gross Revenue',
         value: currencyFormatter.format(stats.totalRevenue),
-        note: `Overall sales`,
+        note: `Total sales`,
         icon: DollarSign,
-        color: 'text-pink-600',
-        bg: 'bg-pink-50',
+        color: 'text-indigo-600',
+        bg: 'bg-indigo-50',
       },
       {
-        label: 'Monthly Revenue',
-        value: currencyFormatter.format(stats.monthlyRevenue),
-        note: `Current month`,
-        icon: TrendingUp,
+        label: 'Cost of Goods Sold',
+        value: currencyFormatter.format(stats.totalCOGS || 0),
+        note: `Total direct costs`,
+        icon: ShoppingBag,
+        color: 'text-rose-600',
+        bg: 'bg-rose-50',
+      },
+      {
+        label: 'Gross Profit',
+        value: currencyFormatter.format(stats.totalProfit || 0),
+        note: `Revenue - COGS`,
+        icon: HandCoins,
         color: 'text-emerald-600',
         bg: 'bg-emerald-50',
       },
       {
-        label: 'Total Orders',
-        value: stats.totalOrders,
-        note: `Active & Completed`,
-        icon: ShoppingBag,
+        label: 'Gross Margin',
+        value: `${stats.grossMargin || 0}%`,
+        note: `Profitability Ratio`,
+        icon: TrendingUp,
         color: 'text-sky-600',
         bg: 'bg-sky-50',
       },
       {
-        label: 'Products',
+        label: 'Inventory Value',
+        value: currencyFormatter.format(stats.inventoryValue || 0),
+        note: `${stats.totalStockQty || 0} items in stock`,
+        icon: Database,
+        color: 'text-orange-600',
+        bg: 'bg-orange-50',
+      },
+      {
+        label: 'Total Customers',
+        value: stats.totalCustomers || 0,
+        note: `Registered Users`,
+        icon: Users,
+        color: 'text-blue-600',
+        bg: 'bg-blue-50',
+      },
+      {
+        label: 'Pending Orders',
+        value: stats.pendingOrders || 0,
+        note: `Awaiting action`,
+        icon: Clock,
+        color: 'text-amber-600',
+        bg: 'bg-amber-50',
+      },
+      {
+        label: 'Live Products',
         value: stats.totalProducts,
         note: `Items in catalog`,
         icon: Boxes,
@@ -131,16 +184,26 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
     <div className='w-full px-4 py-8 md:px-8'>
       <div className='mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Overview Dashboard</h1>
+          <h1 className='text-2xl font-bold text-slate-900'>Financial Dashboard</h1>
           <p className='text-sm text-slate-500 mt-1'>Visual store performance and sales analysis.</p>
         </div>
-        <button
-          onClick={fetchData}
-          disabled={loading}
-          className='inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-60'
-        >
-          {loading ? 'Refreshing...' : 'Refresh Data'}
-        </button>
+        <div className="flex items-center gap-3">
+            <button
+              onClick={handleExport}
+              className='inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50'
+            >
+              <Download size={16} />
+              Export CSV
+            </button>
+            <button
+              onClick={fetchData}
+              disabled={loading}
+              className='inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-200 transition-all hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-60'
+            >
+              <Activity size={16} className="mr-2" />
+              {loading ? 'Refreshing...' : 'Refresh Data'}
+            </button>
+        </div>
       </div>
 
       <div className='mb-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
@@ -170,11 +233,15 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
             </div>
             <div className="h-[360px] w-full">
                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={charts?.revenue || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <ComposedChart data={charts?.financial || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.12}/>
                         <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorCogs" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.1}/>
+                        <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -183,10 +250,12 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
                     <Tooltip 
                       cursor={{ stroke: '#e2e8f0', strokeWidth: 1 }}
                       contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', padding: '12px 16px' }}
-                      formatter={(val) => [currencyFormatter.format(val), 'Doanh thu']}
+                      formatter={(value, name) => [currencyFormatter.format(value), name.charAt(0).toUpperCase() + name.slice(1)]}
                     />
+                    <Legend verticalAlign="top" height={40} iconType="circle" wrapperStyle={{fontSize: '12px', fontWeight: 500}} />
                     <Area type="monotone" dataKey="revenue" stroke="#0ea5e9" strokeWidth={4} fillOpacity={1} fill="url(#colorRev)" />
-                  </AreaChart>
+                    <Area type="monotone" dataKey="cogs" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorCogs)" />
+                  </ComposedChart>
                </ResponsiveContainer>
             </div>
          </div>

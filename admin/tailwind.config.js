@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+// trigger hmr
 export default {
   darkMode: 'class',
   content: [

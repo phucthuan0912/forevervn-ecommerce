@@ -202,6 +202,43 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
   const getStatusBadgeClass = (status) =>
     STATUS_STYLES[status] || 'border-gray-200 bg-gray-50 text-gray-600'
 
+  const exportToCsv = () => {
+    if (!visibleOrders.length) {
+      toast.info('No orders to export');
+      return;
+    }
+
+    const headers = [
+      'Order ID',
+      'Customer Name',
+      'Address',
+      'Items',
+      'Amount',
+      'Status',
+      'Date',
+    ];
+
+    const rows = visibleOrders.map(order => [
+      `"${String(order?._id || '').slice(-8).toUpperCase()}"`,
+      `"${formatCustomerName(order?.address)}"`,
+      `"${formatAddress(order?.address)}"`,
+      `"${(order.items || []).map(item => `${item.name} x ${item.quantity}`).join(', ')}"`,
+      `"${currencyFormatter.format(Number(order?.amount) || 0)}"`,
+      `"${order?.status}"`,
+      `"${new Date(order.date).toLocaleString('vi-VN')}"`,
+    ].join(','));
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className='w-full px-4 py-6 md:px-6'>
       <div className='mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
@@ -228,6 +265,13 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
             className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-500 disabled:cursor-not-allowed disabled:opacity-60'
           >
             {loading ? 'Loading...' : 'Refresh orders'}
+          </button>
+          <button
+            onClick={() => exportToCsv()}
+            disabled={loading}
+            className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-500 disabled:cursor-not-allowed disabled:opacity-60'
+          >
+            Export to CSV
           </button>
         </div>
       </div>

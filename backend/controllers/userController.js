@@ -2,10 +2,32 @@ import userModel from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
+import nodemailer from 'nodemailer';
 import userBehaviorModel from '../models/userBehaviorModel.js';
 import logAction from '../utils/logger.js';
 
 const createToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET);
+const readEnvValue = (key) => String(process.env[key] || '').trim().replace(/^"|"$/g, '');
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const findUserByEmail = (email) =>
+    userModel.findOne({ email: { $regex: new RegExp(`^${escapeRegex(email)}$`, 'i') } });
+
+const getMailTransporter = () => {
+    const emailUser = readEnvValue('EMAIL_USER');
+    const emailPass = readEnvValue('EMAIL_PASS');
+
+    if (!emailUser || !emailPass) {
+        return null;
+    }
+
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: emailUser,
+            pass: emailPass
+        }
+    });
+};
 
 const loginUser = async (req, res) => {
     try {
@@ -56,6 +78,125 @@ const registerUser = async (req, res) => {
         const token = createToken(user._id);
 
         return res.json({ success: true, token });
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
+    }
+};
+
+const sendResetOtp = async (req, res) => {
+    try {
+        const rawEmail = String(req.body?.email || '').trim().toLowerCase();
+        const emailUser = readEnvValue('EMAIL_USER');
+        const transporter = getMailTransporter();
+
+        if (!validator.isEmail(rawEmail)) {
+            return res.json({ success: false, message: 'Please enter a valid email address' });
+        }
+
+        if (!emailUser || !transporter) {
+            return res.json({ success: false, message: 'Password reset email service is not configured yet' });
+        }
+
+        const user = await findUserByEmail(rawEmail);
+
+        if (!user) {
+            return res.json({ success: false, message: 'No account found with that email' });
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        const hashedOtp = await bcrypt.hash(otp, 10);
+        const expireAt = Date.now() + 10 * 60 * 1000;
+
+        user.resetOtp = hashedOtp;
+        user.resetOtpExpireAt = expireAt;
+        await user.save();
+
+        const html = `
+            <div style="font-family:Arial,sans-serif;color:#0f172a;line-height:1.7;max-width:640px;margin:0 auto;padding:24px;background:#fffaf5">
+                <p style="font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#94a3b8;margin:0 0 12px">ForeverVN Account Recovery</p>
+                <h2 style="margin:0 0 14px;font-size:28px;color:#0f172a">Reset your password</h2>
+                <p style="margin:0 0 16px;font-size:15px;color:#475569">
+                    Use the one-time code below to reset your password. The code stays valid for 10 minutes.
+                </p>
+
+                <div style="margin:22px 0;padding:20px 22px;border:1px solid #fed7aa;border-radius:20px;background:#fff7ed">
+                    <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#9a3412">One-Time Password</p>
+                    <div style="display:inline-block;padding:12px 18px;border-radius:999px;background:#0f172a;color:#ffffff;font-size:26px;font-weight:700;letter-spacing:0.22em">
+                        ${otp}
+                    </div>
+                    <p style="margin:14px 0 0;font-size:14px;color:#475569">
+                        If you did not request this reset, you can ignore this email safely.
+                    </p>
+                </div>
+
+                <p style="margin:0;font-size:14px;color:#475569">
+                    ForeverVN Team
+                </p>
+            </div>
+        `;
+
+        await transporter.sendMail({
+            from: `"ForeverVN" <${emailUser}>`,
+            to: rawEmail,
+            subject: 'Your ForeverVN password reset code',
+            html
+        });
+
+        return res.json({
+            success: true,
+            message: 'OTP has been sent to your email'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
+    }
+};
+
+const resetPasswordWithOtp = async (req, res) => {
+    try {
+        const rawEmail = String(req.body?.email || '').trim().toLowerCase();
+        const otp = String(req.body?.otp || '').trim();
+        const newPassword = String(req.body?.newPassword || '');
+
+        if (!validator.isEmail(rawEmail)) {
+            return res.json({ success: false, message: 'Please enter a valid email address' });
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            return res.json({ success: false, message: 'Please enter the 6-digit OTP' });
+        }
+
+        if (newPassword.trim().length < 8) {
+            return res.json({ success: false, message: 'Please enter a strong password' });
+        }
+
+        const user = await findUserByEmail(rawEmail);
+
+        if (!user || !user.resetOtp) {
+            return res.json({ success: false, message: 'Reset OTP is invalid or expired' });
+        }
+
+        if (!user.resetOtpExpireAt || user.resetOtpExpireAt < Date.now()) {
+            user.resetOtp = '';
+            user.resetOtpExpireAt = 0;
+            await user.save();
+            return res.json({ success: false, message: 'OTP has expired. Please request a new one' });
+        }
+
+        const isOtpMatch = await bcrypt.compare(otp, user.resetOtp);
+
+        if (!isOtpMatch) {
+            return res.json({ success: false, message: 'Incorrect OTP' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        user.resetOtp = '';
+        user.resetOtpExpireAt = 0;
+        await user.save();
+
+        return res.json({ success: true, message: 'Password has been reset successfully' });
     } catch (error) {
         console.log(error);
         return res.json({ success: false, message: error.message });
@@ -267,4 +408,17 @@ const updateProfile = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, getCurrentUser, loginAdmin, getAllUsers, deleteUser, createEmployee, logBehavior, updateEmployee, updateProfile };
+export {
+    loginUser,
+    registerUser,
+    sendResetOtp,
+    resetPasswordWithOtp,
+    getCurrentUser,
+    loginAdmin,
+    getAllUsers,
+    deleteUser,
+    createEmployee,
+    logBehavior,
+    updateEmployee,
+    updateProfile
+};

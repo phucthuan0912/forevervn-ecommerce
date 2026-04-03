@@ -1,12 +1,27 @@
 import express from 'express';
 import authUser from '../middleware/auth.js';
 import adminAuth from '../middleware/adminAuth.js';
-import { loginUser, registerUser, getCurrentUser, loginAdmin, getAllUsers, deleteUser, createEmployee, logBehavior, updateEmployee, updateProfile } from '../controllers/userController.js';
+import {
+    loginUser,
+    registerUser,
+    sendResetOtp,
+    resetPasswordWithOtp,
+    getCurrentUser,
+    loginAdmin,
+    getAllUsers,
+    deleteUser,
+    createEmployee,
+    logBehavior,
+    updateEmployee,
+    updateProfile
+} from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
 userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
+userRouter.post('/forgot-password', sendResetOtp);
+userRouter.post('/reset-password', resetPasswordWithOtp);
 userRouter.post('/me', authUser, getCurrentUser);
 userRouter.post('/admin/login', loginAdmin);
 userRouter.get('/list', adminAuth, getAllUsers);

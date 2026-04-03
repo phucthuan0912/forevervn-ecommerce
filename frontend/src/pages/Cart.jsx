@@ -112,15 +112,19 @@ const Cart = () => {
                                     key={`${item._id}-${item.size}-${index}`}
                                     className="section-shell flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
                                 >
-                                    <div className="flex items-start gap-4 sm:gap-5">
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate(`/product/${item._id}`)}
+                                        className="flex items-start gap-4 text-left sm:gap-5"
+                                    >
                                         <img
-                                            className="h-24 w-20 rounded-[20px] object-cover"
+                                            className="h-24 w-20 rounded-[20px] object-cover transition hover:opacity-90"
                                             src={imageSrc}
                                             alt={productData.name}
                                         />
 
                                         <div>
-                                            <p className="text-base font-semibold text-slate-900 sm:text-lg">
+                                            <p className="text-base font-semibold text-slate-900 transition hover:text-slate-700 sm:text-lg">
                                                 {productData.name}
                                             </p>
 
@@ -140,7 +144,7 @@ const Cart = () => {
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
+                                    </button>
 
                                     <div className="flex items-center gap-3 sm:gap-4">
                                         <input

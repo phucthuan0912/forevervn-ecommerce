@@ -17,11 +17,13 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import ToastSoundBridge from './components/ToastSoundBridge'
+import TawkChat from './components/TawkChat'
 
 const App = () => {
   return (
     <div className='min-h-screen'>
       <ToastSoundBridge />
+      <TawkChat />
       <ToastContainer
         autoClose={2400}
         closeButton={false}

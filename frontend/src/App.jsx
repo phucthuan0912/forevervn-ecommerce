@@ -16,10 +16,12 @@ import MyAccount from './pages/MyAccount'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
+import ToastSoundBridge from './components/ToastSoundBridge'
 
 const App = () => {
   return (
     <div className='min-h-screen'>
+      <ToastSoundBridge />
       <ToastContainer
         autoClose={2400}
         closeButton={false}

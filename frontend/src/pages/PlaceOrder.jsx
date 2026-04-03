@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ShopContext } from '../context/ShopContext';
@@ -20,18 +20,19 @@ const PlaceOrder = () => {
     const {
         products,
         cartItems,
-        getCartAmount,
         delivery_fee,
         currency,
         backendUrl,
         token,
         updateCartQty,
         appliedVoucher,
-        getDiscountAmount,
         setDeliveryFee
     } = useContext(ShopContext);
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const buyNowItem = location.state?.buyNowItem || null;
+    const isBuyNowMode = Boolean(buyNowItem);
     const [formData, setFormData] = useState(initialAddress);
     const [loading, setLoading] = useState(false);
     
@@ -111,6 +112,10 @@ const PlaceOrder = () => {
     };
 
     const orderItems = useMemo(() => {
+        if (buyNowItem) {
+            return [buyNowItem];
+        }
+
         const items = [];
 
         for (const itemId in cartItems) {
@@ -139,7 +144,21 @@ const PlaceOrder = () => {
         }
 
         return items;
-    }, [cartItems, products]);
+    }, [buyNowItem, cartItems, products]);
+
+    const orderSubtotal = useMemo(
+        () =>
+            orderItems.reduce(
+                (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
+                0,
+            ),
+        [orderItems],
+    );
+
+    const discountAmount = useMemo(() => {
+        if (!appliedVoucher) return 0;
+        return Math.floor(orderSubtotal * ((Number(appliedVoucher.discountPercent) || 0) / 100));
+    }, [appliedVoucher, orderSubtotal]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -180,8 +199,8 @@ const PlaceOrder = () => {
             const payload = {
                 address: formData,
                 items: orderItems,
-                amount: getCartAmount() - getDiscountAmount() + delivery_fee,
-                discount: getDiscountAmount(),
+                amount: orderSubtotal - discountAmount + delivery_fee,
+                discount: discountAmount,
                 voucherCode: appliedVoucher ? appliedVoucher.code : ''
             };
 
@@ -192,7 +211,9 @@ const PlaceOrder = () => {
             );
 
             if (response?.data?.success) {
-                clearLocalCart();
+                if (!isBuyNowMode) {
+                    clearLocalCart();
+                }
                 toast.success('Dat hang COD thanh cong');
                 navigate('/orders');
                 return;
@@ -305,7 +326,7 @@ const PlaceOrder = () => {
                             <p>Tạm tính</p>
                             <p>
                                 {currency}
-                                {getCartAmount().toLocaleString('vi-VN')} VND
+                                {orderSubtotal.toLocaleString('vi-VN')} VND
                             </p>
                         </div>
 
@@ -314,7 +335,7 @@ const PlaceOrder = () => {
                                 <p>Giảm giá ({appliedVoucher.discountPercent}%)</p>
                                 <p>
                                     -{currency}
-                                    {getDiscountAmount().toLocaleString('vi-VN')} VND
+                                    {discountAmount.toLocaleString('vi-VN')} VND
                                 </p>
                             </div>
                         )}
@@ -332,7 +353,7 @@ const PlaceOrder = () => {
                                 <p>Tổng cộng</p>
                                 <p>
                                     {currency}
-                                    {(getCartAmount() - getDiscountAmount() + delivery_fee).toLocaleString('vi-VN')} VND
+                                    {(orderSubtotal - discountAmount + delivery_fee).toLocaleString('vi-VN')} VND
                                 </p>
                             </div>
                         </div>

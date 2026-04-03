@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -27,9 +27,77 @@ function ensureSizeArray(sizeValue) {
     return ['Free'];
 }
 
+function normalizeCatalogText(value) {
+    return String(value ?? '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function isTryOnEligibleProduct(product) {
+    if (!product) return false;
+
+    const catalogText = normalizeCatalogText(
+        [product.name, product.category, product.subCategory].filter(Boolean).join(' '),
+    );
+
+    const blockedKeywords = [
+        'accessor',
+        'phu kien',
+        'bag',
+        'watch',
+        'belt',
+        'glass',
+        'kinh',
+        'hat',
+        'mu',
+        'shoe',
+        'giay',
+        'dep',
+        'sock',
+        'wallet',
+        'jewelry',
+        'jewellery',
+    ];
+
+    if (blockedKeywords.some((keyword) => catalogText.includes(keyword))) {
+        return false;
+    }
+
+    const clothingKeywords = [
+        'topwear',
+        'bottomwear',
+        'winterwear',
+        'shirt',
+        'tee',
+        't-shirt',
+        'tshirt',
+        'jacket',
+        'coat',
+        'hoodie',
+        'dress',
+        'skirt',
+        'jean',
+        'jeans',
+        'pants',
+        'trousers',
+        'shorts',
+        'blazer',
+        'sweater',
+        'cardigan',
+        'ao',
+        'quan',
+        'vay',
+        'dam',
+        'khoac',
+    ];
+
+    return clothingKeywords.some((keyword) => catalogText.includes(keyword));
+}
+
 const Product = () => {
     const { productId } = useParams();
-    const { products, addToCart, getProductStock, logBehavior } = useContext(ShopContext);
+    const { products, addToCart, getProductStock, logBehavior, navigate } = useContext(ShopContext);
     const [stock, setStock] = useState(0);
 
     const [productData, setProductData] = useState(false);
@@ -38,6 +106,7 @@ const Product = () => {
     const [color, setColor] = useState('');
     const [showVTO, setShowVTO] = useState(false);
     const [reviewStats, setReviewStats] = useState({ averageRating: 0, totalReviews: 0 });
+    const mainImageRef = useRef(null);
 
     const fetchProductData = async () => {
         const item = products.find(
@@ -118,6 +187,7 @@ const Product = () => {
 
     // Image Magnifier State
     const [magnifierStyle, setMagnifierStyle] = useState({ display: 'none', top: 0, left: 0, backgroundPosition: '0% 0%' });
+    const canUseVirtualTryOn = useMemo(() => isTryOnEligibleProduct(productData), [productData]);
 
     const handleMouseMove = (e) => {
         const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -133,6 +203,113 @@ const Product = () => {
     };
 
     const handleMouseLeave = () => setMagnifierStyle({ display: 'none' });
+
+    useEffect(() => {
+        if (!canUseVirtualTryOn) {
+            setShowVTO(false);
+        }
+    }, [canUseVirtualTryOn]);
+
+    const validatePurchaseSelection = () => {
+        if (!size) {
+            toast.error('Vui long chon size!');
+            return false;
+        }
+
+        if (productData?.colors?.length > 0 && !color) {
+            toast.error('Vui long chon mau!');
+            return false;
+        }
+
+        return true;
+    };
+
+    const animateProductToCart = () => {
+        const sourceImage = mainImageRef.current?.querySelector('img');
+        const cartTarget = document.querySelector('[data-cart-target="true"]');
+
+        if (!sourceImage || !cartTarget) return;
+
+        const sourceRect = sourceImage.getBoundingClientRect();
+        const targetRect = cartTarget.getBoundingClientRect();
+        const flyImage = document.createElement('img');
+
+        flyImage.src = image || sourceImage.currentSrc || sourceImage.src;
+        Object.assign(flyImage.style, {
+            position: 'fixed',
+            top: `${sourceRect.top}px`,
+            left: `${sourceRect.left}px`,
+            width: `${sourceRect.width}px`,
+            height: `${sourceRect.height}px`,
+            objectFit: 'cover',
+            borderRadius: '24px',
+            boxShadow: '0 24px 50px rgba(15, 23, 42, 0.18)',
+            pointerEvents: 'none',
+            zIndex: '9999',
+            transformOrigin: 'center center',
+            transition: 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 650ms ease, filter 650ms ease',
+        });
+
+        document.body.appendChild(flyImage);
+
+        const deltaX = targetRect.left + targetRect.width / 2 - (sourceRect.left + sourceRect.width / 2);
+        const deltaY = targetRect.top + targetRect.height / 2 - (sourceRect.top + sourceRect.height / 2);
+
+        requestAnimationFrame(() => {
+            flyImage.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.14)`;
+            flyImage.style.opacity = '0.25';
+            flyImage.style.filter = 'blur(1px)';
+        });
+
+        cartTarget.animate(
+            [
+                { transform: 'scale(1)' },
+                { transform: 'scale(1.12)' },
+                { transform: 'scale(1)' },
+            ],
+            {
+                duration: 460,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+            },
+        );
+
+        const cleanup = () => {
+            if (flyImage.parentNode) {
+                flyImage.parentNode.removeChild(flyImage);
+            }
+        };
+
+        flyImage.addEventListener('transitionend', cleanup, { once: true });
+        window.setTimeout(cleanup, 900);
+    };
+
+    const buildSelectedOrderItem = () => ({
+        _id: productData?._id ?? productData?.id,
+        name: productData?.name,
+        price: productData?.price,
+        image: productData?.image,
+        size,
+        color: color === 'Any' ? '' : color,
+        quantity: 1,
+    });
+
+    const handleAddToCart = () => {
+        if (!validatePurchaseSelection()) return;
+
+        animateProductToCart();
+        addToCart(productData._id ?? productData.id, size, color);
+        toast.success('Da them vao gio hang!');
+    };
+
+    const handleBuyNow = () => {
+        if (!validatePurchaseSelection()) return;
+
+        navigate('/place-order', {
+            state: {
+                buyNowItem: buildSelectedOrderItem(),
+            },
+        });
+    };
 
     return productData ? (
         <div className="space-y-8 py-4 sm:space-y-10 sm:py-6">
@@ -161,6 +338,7 @@ const Product = () => {
                         </div>
 
                         <div 
+                            ref={mainImageRef}
                             className="relative overflow-hidden rounded-[28px] border border-white/70 bg-white/70 p-3 shadow-[0_22px_45px_rgba(15,23,42,0.1)] cursor-crosshair"
                             onMouseMove={handleMouseMove}
                             onMouseLeave={handleMouseLeave}
@@ -285,27 +463,32 @@ const Product = () => {
 
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                             <button
-                                onClick={() => {
-                                    if (!size) return toast.error('Vui long chon size!');
-                                    if (productData.colors?.length > 0 && !color) return toast.error('Vui long chon mau!');
-                                    
-                                    addToCart(productData._id ?? productData.id, size, color);
-                                    toast.success('Da them vao gio hang!');
-                                }}
+                                onClick={handleAddToCart}
                                 className="rounded-full bg-slate-900 px-8 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_18px_36px_rgba(15,23,42,0.16)] hover:-translate-y-0.5 hover:bg-slate-800"
                                 type="button"
                             >
                                 Add To Cart
                             </button>
 
+                            <button
+                                onClick={handleBuyNow}
+                                className="rounded-full border border-slate-900 bg-white px-8 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-900 shadow-[0_18px_36px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 hover:bg-slate-50"
+                                type="button"
+                            >
+                                Buy Now
+                            </button>
+
+                            {canUseVirtualTryOn && (
                             <button 
                                 onClick={() => setShowVTO(true)}
                                 className="group relative overflow-hidden rounded-full border-2 border-indigo-600 px-8 py-3.5 text-sm font-bold uppercase tracking-[0.18em] text-indigo-600 transition-all hover:bg-indigo-600 hover:text-white sm:px-6"
+                                type="button"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     Mặc thử ảo ✨
                                 </span>
                             </button>
+                            )}
 
                             <div className="rounded-full border border-[var(--border)] bg-white px-5 py-4 text-sm text-slate-500">
                                 100% original product
@@ -313,7 +496,7 @@ const Product = () => {
                         </div>
 
                         {/* Virtual Try-On Modal */}
-                        {showVTO && (
+                        {showVTO && canUseVirtualTryOn && (
                             <VirtualTryOn 
                                 productImg={image} 
                                 productName={productData.name} 

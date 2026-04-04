@@ -7,6 +7,7 @@ import {
     userOrders,
     updateStatus,
     cancelOrder,
+    confirmReceived,
     deleteOrder
 } from '../controllers/orderController.js';
 
@@ -18,5 +19,6 @@ orderRouter.post('/status', adminAuth, updateStatus);
 orderRouter.post('/delete', adminAuth, deleteOrder);
 orderRouter.post('/userorders', authUser, userOrders);
 orderRouter.post('/cancel', authUser, cancelOrder);
+orderRouter.post('/confirm-received', authUser, confirmReceived);
 
 export default orderRouter;

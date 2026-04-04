@@ -255,6 +255,49 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+const confirmReceived = async (req, res) => {
+    try {
+        const { userId, orderId } = req.body;
+
+        if (!userId || !orderId) {
+            return res.json({ success: false, message: 'Missing userId or orderId' });
+        }
+
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return res.json({ success: false, message: 'Order not found' });
+        }
+
+        if (String(order.userId) !== String(userId)) {
+            return res.json({ success: false, message: 'Not authorized' });
+        }
+
+        if (order.status === 'Received') {
+            return res.json({ success: true, message: 'Order already confirmed as received' });
+        }
+
+        if (order.status !== 'Delivered') {
+            return res.json({ success: false, message: `Cannot confirm receipt in ${order.status} status` });
+        }
+
+        await orderModel.findByIdAndUpdate(orderId, { status: 'Received' });
+
+        await logAction(
+            userId,
+            'Customer',
+            'UPDATE_ORDER_RECEIVED',
+            `Customer confirmed receipt for order #${String(orderId).slice(-8)}`,
+            orderId,
+        );
+
+        res.json({ success: true, message: 'Order marked as received' });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
 const deleteOrder = async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -276,4 +319,4 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-export { placeOrder, allOrders, userOrders, updateStatus, cancelOrder, deleteOrder };
+export { placeOrder, allOrders, userOrders, updateStatus, cancelOrder, confirmReceived, deleteOrder };

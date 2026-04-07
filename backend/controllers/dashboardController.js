@@ -7,6 +7,7 @@ const getDashboardStats = async (req, res) => {
     try {
         const orders = await orderModel.find({ status: { $ne: 'Cancelled' } });
         const products = await productModel.find({});
+        const productMap = new Map(products.map((product) => [String(product._id), product]));
         
         // New Requirements
         const customersCount = await userModel.countDocuments({ role: 'Customer' });
@@ -16,6 +17,28 @@ const getDashboardStats = async (req, res) => {
         const activeBatches = await importBatchModel.find({ status: 'Active' });
         const totalInventoryValue = activeBatches.reduce((acc, batch) => acc + (batch.remainingQty * batch.costPrice), 0);
         const totalStockQty = activeBatches.reduce((acc, batch) => acc + batch.remainingQty, 0);
+        const lowStockBatches = await importBatchModel
+            .find({
+                status: { $ne: 'Cancelled' },
+                remainingQty: { $gt: 0, $lt: 5 },
+            })
+            .sort({ remainingQty: 1, importDate: 1 });
+
+        const lowStockAlerts = lowStockBatches.map((batch) => {
+            const product = productMap.get(String(batch.productId));
+
+            return {
+                id: String(batch._id),
+                productId: String(batch.productId),
+                productName: product?.name || 'Hidden / removed product',
+                size: batch.size || 'Any',
+                color: batch.color || 'Any',
+                supplier: batch.supplier || '',
+                remainingQty: Number(batch.remainingQty) || 0,
+                costPrice: Number(batch.costPrice) || 0,
+                category: product?.category || '',
+            };
+        });
 
         // Calculate Stats
         const now = new Date();
@@ -87,12 +110,16 @@ const getDashboardStats = async (req, res) => {
                 totalCustomers: customersCount,
                 pendingOrders: pendingOrdersCount,
                 inventoryValue: totalInventoryValue,
-                totalStockQty: totalStockQty
+                totalStockQty: totalStockQty,
+                lowStockCount: lowStockAlerts.length,
             },
             charts: {
                 financial: financialChart,
                 categories: categoryData
-            }
+            },
+            alerts: {
+                lowStock: lowStockAlerts,
+            },
         });
 
     } catch (error) {

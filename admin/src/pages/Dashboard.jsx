@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Icon } from '@iconify/react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,6 +51,7 @@ const statSchema = z
     grossMargin: numberLike,
     inventoryValue: numberLike,
     totalProducts: numberLike,
+    lowStockCount: numberLike,
   })
   .passthrough()
 
@@ -72,6 +74,26 @@ const chartSchema = z
   .object({
     financial: z.array(financialPointSchema).catch([]),
     categories: z.array(categoryPointSchema).catch([]),
+  })
+  .passthrough()
+
+const lowStockItemSchema = z
+  .object({
+    id: stringLike,
+    productId: stringLike.optional(),
+    productName: stringLike,
+    size: stringLike.optional(),
+    color: stringLike.optional(),
+    supplier: stringLike.optional(),
+    category: stringLike.optional(),
+    remainingQty: numberLike,
+    costPrice: numberLike.optional(),
+  })
+  .passthrough()
+
+const alertSchema = z
+  .object({
+    lowStock: z.array(lowStockItemSchema).catch([]),
   })
   .passthrough()
 
@@ -322,6 +344,7 @@ const parseDashboardPayload = (statsResponse, ordersResponse) => {
       success: z.boolean().optional(),
       stats: statSchema,
       charts: chartSchema,
+      alerts: alertSchema.catch({ lowStock: [] }),
     })
     .safeParse(statsResponse)
 
@@ -343,6 +366,7 @@ const parseDashboardPayload = (statsResponse, ordersResponse) => {
   return {
     stats: statsResult.data.stats,
     charts: statsResult.data.charts,
+    alerts: statsResult.data.alerts || { lowStock: [] },
     recentOrders: [...ordersResult.data.orders].sort((a, b) => b.date - a.date).slice(0, 5),
   }
 }
@@ -357,6 +381,7 @@ const fetchDashboardData = async ({ apiBaseUrl, token }) => {
 }
 
 const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const {
     period,
@@ -415,6 +440,7 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
   const data = dashboardQuery.data
   const stats = data?.stats
   const charts = data?.charts
+  const lowStockAlerts = data?.alerts?.lowStock || []
   const recentOrders = data?.recentOrders || []
 
   const topMetrics = useMemo(() => {
@@ -436,11 +462,11 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
         icon: 'mdi:trending-up',
       },
       {
-        key: 'customers',
-        label: 'Customers',
-        sublabel: 'Registered user',
-        value: stats.totalCustomers || 0,
-        icon: 'mdi:account-group-outline',
+        key: 'low-stock',
+        label: 'Low Stock',
+        sublabel: 'Need restock',
+        value: stats.lowStockCount || 0,
+        icon: 'mdi:alert-outline',
       },
     ]
   }, [currencyFormatter, stats])
@@ -528,6 +554,10 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['dashboard', apiBaseUrl, token] })
   }, [apiBaseUrl, queryClient, token])
+
+  const handleOpenImports = useCallback(() => {
+    navigate('/import-batch')
+  }, [navigate])
 
   const isInitialLoading = dashboardQuery.isLoading && !dashboardQuery.data
 
@@ -858,6 +888,71 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
               </Card>
       </motion.div>
     </div>
+  )
+}
+
+const RestockAlertCard = ({ items, onOpenImports, currencyFormatter }) => {
+  if (!items.length) return null
+
+  return (
+    <motion.div variants={itemVariants} className='mt-4'>
+      <Card className='overflow-hidden rounded-none border-[#e7c58d] bg-[linear-gradient(180deg,#fffaf1_0%,#fff5e7_100%)] shadow-[0_22px_48px_rgba(176,120,38,0.10)]'>
+        <CardContent className='p-0'>
+          <div className='flex flex-wrap items-start justify-between gap-4 border-b border-[#efd9b5] px-4 py-4'>
+            <div className='min-w-0'>
+              <div className='mb-2 inline-flex items-center gap-2 rounded-full bg-[#fff0cf] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a16207] ring-1 ring-[#f4d79b]'>
+                <DashboardIcon icon='mdi:alert-circle-outline' size={14} />
+                Restock Alert
+              </div>
+              <p className='text-lg font-semibold text-slate-900'>Stock dưới 5, cần nhập thêm hàng</p>
+              <p className='mt-1 text-sm text-slate-600'>
+                {items.length} batch đang sắp hết. Nên bổ sung trong Imports Hub để tránh hụt đơn.
+              </p>
+            </div>
+
+            <Button
+              type='button'
+              variant='secondary'
+              onClick={onOpenImports}
+              className='border border-[#e7c58d] bg-white text-[#7c5b1b] hover:bg-[#fff7ea]'
+            >
+              <DashboardIcon icon='mdi:package-variant-plus' size={16} />
+              Mở Imports Hub
+            </Button>
+          </div>
+
+          <div className='grid gap-px bg-[#efd9b5] sm:grid-cols-2 xl:grid-cols-4'>
+            {items.slice(0, 4).map((item) => (
+              <div key={item.id} className='bg-white/90 px-4 py-3'>
+                <div className='flex items-start justify-between gap-3'>
+                  <div className='min-w-0'>
+                    <p className='truncate text-[13px] font-semibold text-slate-900'>{item.productName}</p>
+                    <p className='mt-1 text-[11px] uppercase tracking-[0.14em] text-slate-400'>
+                      {(item.category || 'Catalog').trim()}
+                    </p>
+                  </div>
+                  <span className='rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-600 ring-1 ring-rose-100'>
+                    Còn {item.remainingQty}
+                  </span>
+                </div>
+
+                <div className='mt-3 space-y-1 text-[12.5px] text-slate-600'>
+                  <p>
+                    Size: <span className='font-medium text-slate-900'>{item.size || 'Any'}</span>
+                  </p>
+                  <p>
+                    Màu: <span className='font-medium text-slate-900'>{item.color || 'Any'}</span>
+                  </p>
+                  <p>
+                    Giá vốn: <span className='font-medium text-slate-900'>{currencyFormatter.format(item.costPrice || 0)}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
 

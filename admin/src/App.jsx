@@ -30,8 +30,9 @@ const toastProps = {
   newestOnTop: true,
   position: 'top-right',
   toastClassName: () =>
-    'mb-3 rounded-[18px] border border-white/65 bg-white/76 px-4 py-3 text-sm text-slate-500 shadow-[0_10px_22px_rgba(15,23,42,0.06)] backdrop-blur-md',
-  bodyClassName: () => 'p-0 font-medium',
+    'mb-3 min-h-[64px] rounded-[22px] border border-slate-200 bg-white px-4 py-3 text-[15px] text-slate-950 shadow-[0_18px_38px_rgba(15,23,42,0.16)] !opacity-100',
+  bodyClassName: () => '!m-0 !p-0 !text-[15px] !font-bold !leading-6 !text-slate-950 !opacity-100',
+  style: { opacity: 1 },
 }
 
 const App = () => {
@@ -64,9 +65,11 @@ const App = () => {
       <Navbar setToken={setToken} />
 
       <div className='flex min-h-[calc(100vh-81px)] w-full'>
-        <Sidebar />
+        <div className='w-[220px] shrink-0'>
+          <Sidebar />
+        </div>
 
-        <div className='flex-1 min-w-0 p-4 md:p-5 xl:p-6'>
+        <div className='min-w-0 flex-1 p-3 md:p-4 xl:p-5'>
           <Routes>
             <Route path='/' element={<Navigate to='/dashboard' replace />} />
             <Route path='/dashboard' element={<Dashboard token={token} backendUrl={backendUrl} />} />

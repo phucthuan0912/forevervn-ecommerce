@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { backendUrl as defaultBackendUrl } from '../config'
@@ -213,7 +213,7 @@ const Reviews = ({ token, backendUrl: backendUrlFromProps }) => {
   return (
     <ConfigProvider theme={adminAntdTheme} getPopupContainer={getSelectPopupContainer}>
       <div className={pageShellClass}>
-        <div className='mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between'>
+        <div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
           <div>
             <Title level={3} style={{ margin: 0, color: '#0f172a' }}>
               Review Moderation
@@ -238,7 +238,7 @@ const Reviews = ({ token, backendUrl: backendUrlFromProps }) => {
           className='mb-6 shadow-sm'
           bodyStyle={{ padding: 20 }}
         >
-          <div className='flex flex-col gap-4 xl:flex-row'>
+          <div className='flex flex-col gap-4 lg:flex-row'>
             <Input
               size='large'
               placeholder='Search product, customer or review text'
@@ -270,21 +270,21 @@ const Reviews = ({ token, backendUrl: backendUrlFromProps }) => {
           <div className='space-y-4'>
             {filteredList.map((item) => (
               <Card key={item._id} bordered={false} className='shadow-sm'>
-                <div className='flex flex-col gap-4 xl:flex-row'>
+                <div className='flex flex-col gap-4 lg:flex-row'>
                   <div className='xl:w-[210px] xl:shrink-0'>
-                    <div className='flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3'>
-                      <div className='h-9 w-9 overflow-hidden rounded-lg border border-white bg-white'>
+                    <div className='flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2.5'>
+                      <div className='h-8 w-8 overflow-hidden rounded-lg border border-white bg-white'>
                         <img
                           src={getSafeImage(item.productId?.image) || 'https://dummyimage.com/100'}
                           alt={item.productId?.name || 'Product'}
-                          width={36}
-                          height={36}
+                          width={32}
+                          height={32}
                           className='h-full w-full object-cover'
                         />
                       </div>
                       <div className='min-w-0'>
                         <div className='text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400'>Product</div>
-                        <div className='truncate font-semibold text-slate-900'>{item.productId?.name || 'Unknown Product'}</div>
+                        <div className='truncate text-sm font-semibold leading-5 text-slate-900'>{item.productId?.name || 'Unknown Product'}</div>
                       </div>
                     </div>
 
@@ -404,3 +404,4 @@ const Reviews = ({ token, backendUrl: backendUrlFromProps }) => {
 }
 
 export default Reviews
+

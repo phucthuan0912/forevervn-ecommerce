@@ -1,13 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
   DeleteOutlined,
   ExportOutlined,
   ReloadOutlined,
-  ShoppingCartOutlined,
   WalletOutlined,
 } from '@ant-design/icons'
 import {
@@ -22,7 +19,9 @@ import {
   Tag,
   Typography,
 } from 'antd'
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { backendUrl as defaultBackendUrl } from '../config'
+import { useAdminLocale } from '../lib/adminLocale'
 import {
   adminAntdTheme,
   compactStatCardClass,
@@ -32,7 +31,7 @@ import {
   pageShellClass,
 } from '../lib/adminAntd'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 const ORDER_STATUSES = ['Order Placed', 'Packing', 'Shipped', 'Out for Delivery', 'Delivered', 'Received', 'Cancelled']
 const REFRESH_INTERVAL_MS = 10000
@@ -47,12 +46,23 @@ const STATUS_COLORS = {
   Cancelled: 'error',
 }
 
+const STATUS_PIE_COLORS = {
+  'Order Placed': '#60a5fa',
+  Packing: '#f59e0b',
+  Shipped: '#8b5cf6',
+  'Out for Delivery': '#fb923c',
+  Delivered: '#22c55e',
+  Received: '#14b8a6',
+  Cancelled: '#f87171',
+}
+
 const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [updatingId, setUpdatingId] = useState('')
   const [removingId, setRemovingId] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
+  const { t, statusLabel } = useAdminLocale()
 
   const currencyFormatter = useMemo(
     () =>
@@ -73,7 +83,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
     const normalized = (message || '').toLowerCase()
     if (!normalized.includes('not authorized')) return false
 
-    toast.error('Session expired, please login again')
+    toast.error(t('orders.sessionExpired'))
     localStorage.removeItem('token')
     setTimeout(() => window.location.reload(), 400)
     return true
@@ -105,10 +115,10 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
 
         if (handleUnauthorized(data?.message)) return
         if (!silent) {
-          toast.error(data?.message || 'Cannot load orders')
+      toast.error(data?.message || t('orders.loadFailed'))
         }
       } catch (error) {
-        const message = error.response?.data?.message || error.message || 'Cannot load orders'
+        const message = error.response?.data?.message || error.message || t('orders.loadFailed')
         if (handleUnauthorized(message)) return
         if (!silent) {
           toast.error(message)
@@ -152,7 +162,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
       )
 
       if (data?.success) {
-        toast.success(data.message || 'Order status updated')
+        toast.success(data.message || t('orders.statusUpdated'))
         fetchOrders({ silent: true })
         return
       }
@@ -162,13 +172,13 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
       )
 
       if (handleUnauthorized(data?.message)) return
-      toast.error(data?.message || 'Cannot update order status')
+      toast.error(data?.message || t('orders.statusUpdateFailed'))
     } catch (error) {
       setOrders((prev) =>
         prev.map((order) => (order._id === orderId ? { ...order, status: previousStatus } : order)),
       )
 
-      const message = error.response?.data?.message || error.message || 'Cannot update order status'
+      const message = error.response?.data?.message || error.message || t('orders.statusUpdateFailed')
       if (handleUnauthorized(message)) return
       toast.error(message)
     } finally {
@@ -188,14 +198,14 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
       )
 
       if (data?.success) {
-        toast.success(data.message || 'Order deleted')
+        toast.success(data.message || t('orders.deleted'))
         fetchOrders({ silent: true })
       } else {
         if (handleUnauthorized(data?.message)) return
-        toast.error(data?.message || 'Cannot delete order')
+        toast.error(data?.message || t('orders.deleteFailed'))
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Cannot delete order'
+      const message = error.response?.data?.message || error.message || t('orders.deleteFailed')
       if (handleUnauthorized(message)) return
       toast.error(message)
     } finally {
@@ -212,7 +222,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
   }, [orders, statusFilter])
 
   const formatCustomerName = (address = {}) =>
-    address?.fullName || [address?.firstName, address?.lastName].filter(Boolean).join(' ') || 'Unknown customer'
+    address?.fullName || [address?.firstName, address?.lastName].filter(Boolean).join(' ') || t('orders.unknownCustomer')
 
   const formatAddress = (address = {}) => {
     if (address?.province) {
@@ -221,7 +231,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
         .join(', ')
     }
 
-    return [address?.street, address?.city, address?.state].filter(Boolean).join(', ') || 'No address provided'
+    return [address?.street, address?.city, address?.state].filter(Boolean).join(', ') || t('orders.noAddress')
   }
 
   const getItemCount = (items = []) =>
@@ -229,7 +239,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
 
   const exportToCsv = () => {
     if (!visibleOrders.length) {
-      toast.info('No orders to export')
+      toast.info(t('orders.exportEmpty'))
       return
     }
 
@@ -258,45 +268,34 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
     document.body.removeChild(link)
   }
 
-  const stats = useMemo(() => {
-    const pending = orders.filter((order) => ['Order Placed', 'Packing'].includes(order?.status)).length
-    const delivered = orders.filter((order) => ['Delivered', 'Received'].includes(order?.status)).length
+  const orderStatusOverview = useMemo(() => {
+    const counts = ORDER_STATUSES.map((status) => ({
+      name: status,
+      value: orders.filter((order) => order?.status === status).length,
+      color: STATUS_PIE_COLORS[status] || '#cbd5e1',
+    }))
+
+    const activeCounts = counts.filter((item) => item.value > 0)
     const revenue = orders
       .filter((order) => order?.status !== 'Cancelled')
       .reduce((total, order) => total + (Number(order?.amount) || 0), 0)
 
-    return [
-      {
-        key: 'total',
-        title: 'Total Orders',
-        value: orders.length,
-        icon: <ShoppingCartOutlined style={{ color: '#ec4899' }} />,
-      },
-      {
-        key: 'pending',
-        title: 'Pending Fulfillment',
-        value: pending,
-        icon: <ClockCircleOutlined style={{ color: '#f59e0b' }} />,
-      },
-      {
-        key: 'delivered',
-        title: 'Delivered',
-        value: delivered,
-        icon: <CheckCircleOutlined style={{ color: '#16a34a' }} />,
-      },
-      {
-        key: 'revenue',
-        title: 'Live Revenue',
-        value: currencyFormatter.format(revenue),
-        icon: <WalletOutlined style={{ color: '#2563eb' }} />,
-      },
-    ]
+    return {
+      totalOrders: orders.length,
+      revenue,
+      counts,
+      activeCounts,
+      chartData:
+        activeCounts.length > 0
+          ? activeCounts
+          : [{ name: 'No orders', value: 1, color: '#e2e8f0' }],
+    }
   }, [currencyFormatter, orders])
 
   const columns = useMemo(
     () => [
       {
-        title: 'Order',
+        title: t('orders.order'),
         key: 'order',
         width: 170,
         render: (_, order) => (
@@ -313,7 +312,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
         ),
       },
       {
-        title: 'Customer',
+        title: t('orders.customer'),
         key: 'customer',
         width: 280,
         render: (_, order) => (
@@ -333,13 +332,13 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
         ),
       },
       {
-        title: 'Items',
+        title: t('orders.items'),
         key: 'items',
         width: 320,
         render: (_, order) => (
           <div>
             <div style={{ marginBottom: 8 }}>
-              <Text style={{ fontSize: 12, color: '#94a3b8' }}>{getItemCount(order?.items || [])} items</Text>
+              <Text style={{ fontSize: 12, color: '#94a3b8' }}>{getItemCount(order?.items || [])} {t('orders.itemsCount')}</Text>
             </div>
             <Space size={[6, 6]} wrap>
               {(Array.isArray(order?.items) ? order.items : []).map((item, index) => (
@@ -355,7 +354,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
                     background: '#f8fafc',
                   }}
                 >
-                  {`${item?.name || 'Product'} x ${Number(item?.quantity) || 0}`}
+                  {`${item?.name || t('orders.productFallback')} x ${Number(item?.quantity) || 0}`}
                   {item?.size ? ` | ${item.size}` : ''}
                 </Tag>
               ))}
@@ -364,7 +363,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
         ),
       },
       {
-        title: 'Payment',
+        title: t('orders.payment'),
         key: 'payment',
         width: 180,
         render: (_, order) => (
@@ -377,14 +376,14 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
             </div>
             <div style={{ marginTop: 6 }}>
               <Tag color={order?.payment ? 'success' : 'gold'} style={{ borderRadius: 999, fontWeight: 600 }}>
-                {order?.payment ? 'Paid' : 'Pending'}
+                {order?.payment ? t('orders.paid') : t('orders.pending')}
               </Tag>
             </div>
           </div>
         ),
       },
       {
-        title: 'Status',
+        title: t('orders.status'),
         key: 'status',
         width: 220,
         render: (_, order) => {
@@ -397,7 +396,7 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
             <div>
               <div style={{ marginBottom: 10 }}>
                 <Tag color={STATUS_COLORS[order?.status] || 'default'} style={{ borderRadius: 999, fontWeight: 600 }}>
-                  {order?.status || 'Unknown'}
+                  {statusLabel(order?.status || 'Unknown')}
                 </Tag>
               </div>
               <select
@@ -417,17 +416,17 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
         },
       },
       {
-        title: 'Action',
+        title: t('orders.action'),
         key: 'action',
         width: 110,
         align: 'center',
         render: (_, order) =>
           order?.status === 'Cancelled' ? (
             <Popconfirm
-              title='Delete cancelled order'
-              description='This will permanently remove the order record.'
-              okText='Delete'
-              cancelText='Cancel'
+              title={t('orders.deleteTitle')}
+              description={t('orders.deleteDescription')}
+              okText={t('orders.delete')}
+              cancelText={t('orders.cancel')}
               okButtonProps={{ danger: true, loading: removingId === order?._id }}
               onConfirm={() => handleDeleteOrder(order?._id)}
             >
@@ -440,60 +439,112 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
           ),
       },
     ],
-    [currencyFormatter, handleStatusChange, removingId, updatingId],
+    [currencyFormatter, handleStatusChange, removingId, statusLabel, t, updatingId],
   )
 
   return (
     <ConfigProvider theme={adminAntdTheme} getPopupContainer={getSelectPopupContainer}>
       <div className={pageShellClass}>
-        <div className='mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between'>
-          <div>
-            <Title level={3} style={{ margin: 0, color: '#0f172a' }}>
-              Orders Flow
-            </Title>
-            <Text type='secondary'>Monitor fulfillment, update statuses and export the current order feed.</Text>
-          </div>
-
+        <div className='mb-3 flex justify-end'>
           <Space size={12} wrap>
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
               className={`${nativeSelectClass} min-w-[180px]`}
             >
-              <option value='All'>All statuses</option>
+              <option value='All'>{t('orders.allStatuses')}</option>
               {ORDER_STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {statusLabel(status)}
                 </option>
               ))}
             </select>
             <Button size='large' icon={<ReloadOutlined />} loading={loading} onClick={() => fetchOrders()}>
-              Refresh orders
+              {t('orders.refresh')}
             </Button>
             <Button size='large' icon={<ExportOutlined />} onClick={exportToCsv}>
-              Export CSV
+              {t('orders.export')}
             </Button>
           </Space>
         </div>
 
-        <div className={compactStatsRowClass}>
-          {stats.map((item) => (
-            <Card key={item.key} bordered={false} className={compactStatCardClass}>
-              <Statistic title={item.title} value={item.value} prefix={item.icon} valueStyle={{ color: '#0f172a' }} />
-            </Card>
-          ))}
+        <div className={`${compactStatsRowClass} items-stretch`}>
+          <Card bordered={false} className='min-w-[430px] flex-[2.2] shadow-sm'>
+            <div className='flex h-full items-center justify-center'>
+              <div className='h-[220px] w-full max-w-[300px] shrink-0'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <PieChart>
+                      <Pie
+                        data={orderStatusOverview.chartData}
+                        dataKey='value'
+                        nameKey='name'
+                        innerRadius={52}
+                        outerRadius={78}
+                        paddingAngle={2}
+                        stroke='none'
+                        labelLine={orderStatusOverview.totalOrders > 0}
+                        label={({ cx, cy, midAngle, outerRadius, percent, value }) => {
+                          if (!orderStatusOverview.totalOrders) return null
+                          const RADIAN = Math.PI / 180
+                          const radius = Number(outerRadius) + 18
+                          const x = Number(cx) + radius * Math.cos(-midAngle * RADIAN)
+                          const y = Number(cy) + radius * Math.sin(-midAngle * RADIAN)
+
+                          return (
+                            <text
+                              x={x}
+                              y={y}
+                              fill='#64748b'
+                              textAnchor={x > Number(cx) ? 'start' : 'end'}
+                              dominantBaseline='central'
+                              style={{ fontSize: 12, fontWeight: 500 }}
+                            >
+                              {`${value} (${Math.round(percent * 100)}%)`}
+                            </text>
+                          )
+                        }}
+                      >
+                        {orderStatusOverview.chartData.map((entry) => (
+                          <Cell key={entry.name} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value, name) => [`${value} ${t('orders.ordersLabel')}`, statusLabel(name)]}
+                        contentStyle={{
+                          borderRadius: 16,
+                          border: '1px solid #e2e8f0',
+                          boxShadow: '0 12px 30px rgba(15,23,42,0.08)',
+                        }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </Card>
+
+          <Card bordered={false} className={compactStatCardClass}>
+            <Statistic
+              title={t('orders.liveRevenue')}
+              value={currencyFormatter.format(orderStatusOverview.revenue)}
+              prefix={<WalletOutlined style={{ color: '#2563eb' }} />}
+              valueStyle={{ color: '#0f172a' }}
+            />
+            <div className='mt-4 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-500'>
+              {t('orders.revenueHelp')}
+            </div>
+          </Card>
         </div>
 
         <Card
           bordered={false}
-          className='shadow-sm'
-          title={
-            <div>
-              <div className='font-semibold text-slate-900'>Order Directory</div>
-              <div className='text-xs font-normal text-slate-400'>Auto-refreshes every 10 seconds from the live database.</div>
-            </div>
-          }
-        >
+            className='shadow-sm'
+            title={
+              <div>
+              <div className='font-semibold text-slate-900'>{t('orders.orderDirectory')}</div>
+              <div className='text-xs font-normal text-slate-400'>{t('orders.orderDirectoryHelp')}</div>
+              </div>
+            }
+          >
           <Table
             rowKey='_id'
             columns={columns}
@@ -501,12 +552,12 @@ const Orders = ({ token, backendUrl: backendUrlFromProps }) => {
             loading={loading}
             size='middle'
             pagination={{ pageSize: 6, showSizeChanger: false, size: 'small' }}
-            scroll={{ x: 1280 }}
-            locale={{
-              emptyText: <Empty description='No orders found' image={Empty.PRESENTED_IMAGE_SIMPLE} />,
-            }}
-          />
-        </Card>
+              scroll={{ x: 1280 }}
+              locale={{
+              emptyText: <Empty description={t('orders.noOrders')} image={Empty.PRESENTED_IMAGE_SIMPLE} />,
+              }}
+            />
+          </Card>
       </div>
     </ConfigProvider>
   )

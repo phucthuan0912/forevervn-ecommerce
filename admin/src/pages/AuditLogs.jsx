@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+﻿import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { backendUrl as defaultBackendUrl } from '../config'
@@ -274,7 +274,7 @@ const AuditLogs = ({ token, backendUrl: backendUrlFromProps }) => {
   return (
     <ConfigProvider theme={adminAntdTheme} getPopupContainer={getSelectPopupContainer}>
       <div className={pageShellClass}>
-        <div className='mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between'>
+        <div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
           <div>
             <Title level={3} style={{ margin: 0, color: '#0f172a' }}>
               Audit Trail
@@ -295,7 +295,7 @@ const AuditLogs = ({ token, backendUrl: backendUrlFromProps }) => {
         </div>
 
         <Card bordered={false} className='mb-6 shadow-sm' bodyStyle={{ padding: 20 }}>
-          <div className='flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between'>
+          <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
             <Segmented
               value={activeTab}
               onChange={setActiveTab}
@@ -355,3 +355,4 @@ const AuditLogs = ({ token, backendUrl: backendUrlFromProps }) => {
 }
 
 export default AuditLogs
+

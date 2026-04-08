@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import logo from '../assets/logo.png'
 import { backendUrl } from '../config'
+import { useAdminLocale } from '../lib/adminLocale'
 
 const Login = ({ setToken }) => {
   const [email,    setEmail]    = useState('')
@@ -12,22 +13,23 @@ const Login = ({ setToken }) => {
   const [loading,  setLoading]  = useState(false)
   const [showPw,   setShowPw]   = useState(false)
   const navigate = useNavigate()
+  const { locale, setLocale, t } = useAdminLocale()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!backendUrl) { toast.error('Missing VITE_BACKEND_URL in .env'); return }
+    if (!backendUrl) { toast.error(t('login.noBackend')); return }
     setLoading(true)
     try {
       const { data } = await axios.post(`${backendUrl}/api/user/admin/login`, {
         email: email.trim(), password,
       })
-      if (!data?.success) { toast.error(data?.message || 'Login failed'); return }
-      if (!data?.token)   { toast.error('Server did not return a token'); return }
+      if (!data?.success) { toast.error(data?.message || t('login.loginFailed')); return }
+      if (!data?.token)   { toast.error(t('login.noToken')); return }
       setToken(data.token)
-      toast.success('Welcome back!')
+      toast.success(t('login.welcomeBack'))
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || 'Login failed')
+      toast.error(err.response?.data?.message || err.message || t('login.loginFailed'))
     } finally {
       setLoading(false)
     }
@@ -355,32 +357,28 @@ const Login = ({ setToken }) => {
               <div className="fv-logo-wrap">
                 <img src={logo} alt="Forever" className="fv-logo-img" />
                 <span className="fv-logo-sep" />
-                <span className="fv-logo-tag">Admin</span>
+                <span className="fv-logo-tag">{t('login.admin')}</span>
               </div>
 
               {/* Hero */}
               <div className="fv-hero">
-                <div className="fv-hero-eyebrow">Admin Panel</div>
+                <div className="fv-hero-eyebrow">{t('login.eyebrow')}</div>
                 <h1 className="fv-hero-title">
-                  Clean control,<br />
-                  <em>sharper</em> focus.
+                  {t('login.titleMain')}<br />
+                  <em>{t('login.titleAccent')}</em>
                 </h1>
                 <p className="fv-hero-desc">
-                  Manage products, orders and store performance from one refined editorial dashboard.
+                  {t('login.description')}
                 </p>
               </div>
             </div>
 
             {/* Feature chips */}
             <div className="fv-chips">
-              {[
-                'Product publishing with cleaner structure',
-                'Faster inventory and order review',
-                'Same backend logic, cleaner admin surface',
-              ].map((t) => (
-                <div key={t} className="fv-chip">
+              {(t('login.chips', []) || []).map((chip) => (
+                <div key={chip} className="fv-chip">
                   <span className="fv-chip-dot" />
-                  <span className="fv-chip-text">{t}</span>
+                  <span className="fv-chip-text">{chip}</span>
                 </div>
               ))}
             </div>
@@ -389,24 +387,48 @@ const Login = ({ setToken }) => {
           {/* ══════ RIGHT PANEL ══════ */}
           <div className="fv-panel-right">
             <div className="fv-form-header">
-              <p className="fv-form-eyebrow">Secure Access</p>
-              <h2 className="fv-form-title">Sign in</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                <p className="fv-form-eyebrow">{t('login.secureAccess')}</p>
+                <div style={{ display: 'inline-flex', gap: '6px', padding: '4px', borderRadius: '999px', background: '#f3f4f6' }}>
+                  {['vi', 'en'].map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => setLocale(code)}
+                      style={{
+                        border: 'none',
+                        background: locale === code ? '#1a2035' : 'transparent',
+                        color: locale === code ? '#fff' : '#64748b',
+                        borderRadius: '999px',
+                        padding: '8px 12px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        letterSpacing: '0.12em',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {code.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <h2 className="fv-form-title">{t('login.signIn')}</h2>
               <p className="fv-form-sub">
-                Use your admin credentials to continue.
+                {t('login.signInDescription')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit}>
               {/* Email */}
               <div className="fv-field">
-                <label className="fv-label" htmlFor="fv-email">Email address</label>
+                <label className="fv-label" htmlFor="fv-email">{t('login.email')}</label>
                 <div className="fv-input-wrap">
                   <Mail size={16} className="fv-input-icon" />
                   <input
                     id="fv-email"
                     type="email"
                     className="fv-input"
-                    placeholder="you@example.com"
+                    placeholder={t('login.emailPlaceholder')}
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
@@ -417,7 +439,7 @@ const Login = ({ setToken }) => {
 
               {/* Password */}
               <div className="fv-field">
-                <label className="fv-label" htmlFor="fv-password">Password</label>
+                <label className="fv-label" htmlFor="fv-password">{t('login.password')}</label>
                 <div className="fv-input-wrap">
                   <Lock size={16} className="fv-input-icon" />
                   <input
@@ -435,7 +457,7 @@ const Login = ({ setToken }) => {
                     className="fv-pw-toggle"
                     onClick={() => setShowPw(p => !p)}
                     tabIndex={-1}
-                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                    aria-label={showPw ? t('login.hidePassword') : t('login.showPassword')}
                   >
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -450,7 +472,7 @@ const Login = ({ setToken }) => {
                   </span>
                 ) : (
                   <>
-                    Sign in
+                    {t('login.submit')}
                     <span className="fv-submit-arrow">
                       <ArrowRight size={14} />
                     </span>

@@ -223,11 +223,11 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
     }
 
     return (
-      <div className='flex h-full w-full flex-col items-center justify-center gap-1.5 bg-slate-50 text-slate-400'>
-        <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm'>
-          <InboxOutlined style={{ fontSize: 16, color: '#94a3b8' }} />
+      <div className='flex h-full w-full flex-col items-center justify-center gap-1.5 bg-transparent text-[#a68f76]'>
+        <div className='flex h-[38px] w-[38px] items-center justify-center rounded-full bg-white shadow-[0_4px_16px_rgba(166,123,39,0.12)] ring-1 ring-[#f4e2c9] transition hover:scale-110'>
+          <InboxOutlined style={{ fontSize: 18, color: '#a67b27' }} />
         </div>
-        <span className='text-[10px] font-medium'>Upload</span>
+        <span className='mt-1 text-[11px] font-semibold tracking-wide'>Upload</span>
       </div>
     )
   }
@@ -313,34 +313,14 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
     }
   }
 
-  const stats = [
-    {
-      key: 'images',
-      title: 'Selected Images',
-      value: filledImageCount,
-      icon: <PictureOutlined style={{ color: '#ec4899' }} />,
-    },
-    {
-      key: 'sizes',
-      title: 'Sizes Ready',
-      value: sizes.length,
-      icon: <TagsOutlined style={{ color: '#2563eb' }} />,
-    },
-    {
-      key: 'colors',
-      title: 'Colors Added',
-      value: colors.length,
-      icon: <BgColorsOutlined style={{ color: '#f97316' }} />,
-    },
-  ]
 
   return (
     <ConfigProvider theme={adminAntdTheme} getPopupContainer={getSelectPopupContainer}>
       <form onSubmit={onSubmitHandler}>
         <div className={pageShellClass}>
-          <div className='mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between'>
+          <div className='mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
             <div>
-              <Title level={3} style={{ margin: 0, color: '#0f172a' }}>
+              <Title level={3} style={{ margin: 0, color: 'var(--admin-text)' }}>
                 Add Product
               </Title>
               <Text type='secondary'>
@@ -364,32 +344,20 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             </Space>
           </div>
 
-          <div className={compactStatsRowClass}>
-            {stats.map((item) => (
-              <Card key={item.key} bordered={false} className={compactStatCardClass}>
-                <Statistic
-                  title={item.title}
-                  value={item.value}
-                  prefix={item.icon}
-                  valueStyle={{ color: '#0f172a' }}
-                />
-              </Card>
-            ))}
-          </div>
 
-          <div className='flex flex-col gap-4 xl:flex-row xl:items-start'>
+          <div className='flex flex-col gap-4 lg:flex-row lg:items-start'>
             <Card
               bordered={false}
-              className='shadow-sm xl:min-w-0 xl:flex-1'
+              className='admin-card overflow-hidden xl:min-w-0 xl:flex-1'
             >
               <div className='space-y-4'>
                 <div>
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     Product Name
                   </Text>
                   <Input
                     size='large'
-                    className='mt-2'
+                    className='mt-2 !bg-[var(--admin-surface)] !text-[var(--admin-text)] !border-[var(--admin-border)] placeholder:!text-[var(--admin-muted)]'
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder='Enter product name'
@@ -398,11 +366,11 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                 </div>
 
                 <div>
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     Product Description
                   </Text>
                   <TextArea
-                    className='mt-2'
+                    className='mt-2 !bg-[var(--admin-surface)] !text-[var(--admin-text)] !border-[var(--admin-border)] placeholder:!text-[var(--admin-muted)]'
                     rows={4}
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
@@ -413,13 +381,13 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
 
                 <div className='grid gap-3 lg:grid-cols-2'>
                   <div>
-                    <Text strong style={{ color: '#0f172a' }}>
+                    <Text strong style={{ color: 'var(--admin-text)' }}>
                       Category
                     </Text>
                     <select
                       value={category}
                       onChange={(event) => setCategory(event.target.value)}
-                      className={`mt-2 ${nativeSelectClass}`}
+                      className="mt-2 admin-select"
                     >
                       {!category ? <option value=''>Select category</option> : null}
                       {categories.map((item) => (
@@ -431,14 +399,14 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                   </div>
 
                   <div>
-                    <Text strong style={{ color: '#0f172a' }}>
+                    <Text strong style={{ color: 'var(--admin-text)' }}>
                       Sub Category
                     </Text>
                     <select
                       value={subCategory}
                       onChange={(event) => setSubCategory(event.target.value)}
                       disabled={!subCategories.length}
-                      className={`mt-2 ${nativeSelectClass}`}
+                      className="mt-2 admin-select"
                     >
                       {!subCategories.length ? <option value=''>No sub-category</option> : null}
                       {subCategories.map((item) => (
@@ -450,12 +418,12 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                   </div>
 
                   <div>
-                    <Text strong style={{ color: '#0f172a' }}>
+                    <Text strong style={{ color: 'var(--admin-text)' }}>
                       Sell Price
                     </Text>
                     <Input
                       size='large'
-                      className='mt-2'
+                      className='mt-2 !bg-[var(--admin-surface)] !text-[var(--admin-text)] !border-[var(--admin-border)] placeholder:!text-[var(--admin-muted)]'
                       type='number'
                       min={0}
                       value={price}
@@ -466,12 +434,12 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                   </div>
 
                   <div>
-                    <Text strong style={{ color: '#0f172a' }}>
+                    <Text strong style={{ color: 'var(--admin-text)' }}>
                       Original Price
                     </Text>
                     <Input
                       size='large'
-                      className='mt-2'
+                      className='mt-2 !bg-[var(--admin-surface)] !text-[var(--admin-text)] !border-[var(--admin-border)] placeholder:!text-[var(--admin-muted)]'
                       type='number'
                       min={0}
                       value={oldPrice}
@@ -485,10 +453,10 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             <div className='flex w-full flex-col gap-4 xl:w-[400px] 2xl:w-[440px]'>
               <Card
                 bordered={false}
-                className='shadow-sm'
+                className='admin-card overflow-hidden'
                 title={
                   <Space size={10}>
-                    <div className='flex h-9 w-9 items-center justify-center rounded-2xl bg-blue-50 text-blue-500'>
+                    <div className='flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--admin-accent-soft)] shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)] ring-1 ring-[var(--admin-border)] text-[var(--admin-tertiary)]'>
                       <PictureOutlined />
                     </div>
                     <div>
@@ -502,11 +470,11 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
               >
                 <div className='grid grid-cols-2 gap-2'>
                   {images.map((file, index) => (
-                    <div key={`image-${index}`} className='rounded-2xl border border-slate-100 bg-slate-50 p-2'>
+                    <div key={`image-${index}`} className='admin-panel p-2 shadow-[0_8px_20px_rgba(31,26,23,0.03)]'>
                       <label htmlFor={`image${index + 1}`} className='block cursor-pointer'>
-                        <div className='relative h-20 overflow-hidden rounded-2xl border border-dashed border-slate-200 bg-white'>
+                        <div className='relative h-28 overflow-hidden rounded-[18px] border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] backdrop-blur transition hover:bg-[var(--admin-surface-solid)]'>
                           {renderUploadSlot(index, file)}
-                          <div className='absolute inset-x-1.5 bottom-1.5 rounded-lg bg-white/95 px-2 py-1 text-center text-[10px] font-semibold text-slate-500 shadow-sm'>
+                          <div className='absolute inset-x-1.5 bottom-1.5 rounded-lg bg-[var(--admin-surface-solid)] px-2 py-1 text-center text-[10px] font-semibold text-[var(--admin-muted)] shadow-sm'>
                             {file ? `Image ${index + 1}` : `Slot ${index + 1}`}
                           </div>
                         </div>
@@ -535,12 +503,12 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                 </div>
 
                 <div className='mt-3'>
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     TikTok Video URL
                   </Text>
                   <Input
                     size='large'
-                    className='mt-2'
+                    className='mt-2 !bg-[var(--admin-surface)] !text-[var(--admin-text)] !border-[var(--admin-border)] placeholder:!text-[var(--admin-muted)]'
                     prefix={<PlayCircleOutlined style={{ color: '#94a3b8' }} />}
                     value={videoUrl}
                     onChange={(event) => setVideoUrl(event.target.value)}
@@ -557,10 +525,10 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
 
           <Card
             bordered={false}
-            className='mt-4 shadow-sm'
+            className='admin-card overflow-hidden mt-6'
             title={
               <Space size={10}>
-                <div className='flex h-9 w-9 items-center justify-center rounded-2xl bg-amber-50 text-amber-500'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-[14px] bg-[var(--admin-accent-soft)] shadow-[inset_0_2px_4px_rgba(255,255,255,0.1)] ring-1 ring-[var(--admin-border)] text-[var(--admin-tertiary)]'>
                   <TagsOutlined />
                 </div>
                 <div>
@@ -573,10 +541,10 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             }
           >
             <div className='grid gap-4 lg:grid-cols-3'>
-              <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4'>
+              <div className='admin-panel p-4.5 shadow-[0_8px_20px_rgba(31,26,23,0.03)]'>
                 <div className='mb-2 flex items-center gap-2'>
-                  <BgColorsOutlined style={{ color: '#f97316' }} />
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <BgColorsOutlined style={{ color: 'var(--admin-tertiary)' }} />
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     Product Colors
                   </Text>
                 </div>
@@ -625,10 +593,10 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                 </div>
               </div>
 
-              <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4'>
+              <div className='admin-panel p-4.5 shadow-[0_8px_20px_rgba(31,26,23,0.03)]'>
                 <div className='mb-2 flex items-center gap-2'>
-                  <TagsOutlined style={{ color: '#2563eb' }} />
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <TagsOutlined style={{ color: 'var(--admin-tertiary)' }} />
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     Product Sizes
                   </Text>
                 </div>
@@ -692,18 +660,18 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
                 </div>
               </div>
 
-              <div className='rounded-2xl border border-slate-100 bg-slate-50 p-4'>
+              <div className='admin-panel p-4.5 shadow-[0_8px_20px_rgba(31,26,23,0.03)]'>
                 <div className='mb-2 flex items-center gap-2'>
-                  <FireOutlined style={{ color: '#ec4899' }} />
-                  <Text strong style={{ color: '#0f172a' }}>
+                  <FireOutlined style={{ color: 'var(--admin-tertiary)' }} />
+                  <Text strong style={{ color: 'var(--admin-text)' }}>
                     Bestseller
                   </Text>
                 </div>
                 <Text type='secondary' style={{ display: 'block', marginBottom: 16, lineHeight: 1.6 }}>
                   Highlight this item in bestseller sections.
                 </Text>
-                <div className='flex items-center justify-between rounded-2xl border border-white bg-white px-4 py-3'>
-                  <Text style={{ color: '#475569', fontWeight: 500 }}>
+                <div className='flex items-center justify-between rounded-[18px] border border-[var(--admin-border)] bg-[var(--admin-surface)] backdrop-blur px-5 py-3.5 shadow-sm'>
+                  <Text style={{ color: 'var(--admin-text)', fontWeight: 500 }}>
                     {bestseller ? 'Enabled' : 'Disabled'}
                   </Text>
                   <Switch checked={bestseller} onChange={setBestseller} />
@@ -712,7 +680,10 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
             </div>
           </Card>
 
-          <Card bordered={false} className='mt-6 shadow-sm'>
+          <Card 
+            bordered={false} 
+            className='admin-card mt-6 overflow-hidden'
+          >
             <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
               <div>
                 <div className='font-semibold text-slate-900'>Ready to publish</div>
@@ -744,3 +715,4 @@ const Add = ({ token, setToken, backendUrl: backendUrlFromProps }) => {
 }
 
 export default Add
+

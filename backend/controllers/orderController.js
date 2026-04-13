@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import orderModel from '../models/orderModel.js';
 import userModel from '../models/userModel.js';
+import walletTransactionModel from '../models/walletTransactionModel.js';
 import importBatchModel from '../models/importBatchModel.js';
 import logAction from '../utils/logger.js';
 import { buildInventoryFilter, getAvailableStock, normalizeVariantColor } from '../utils/inventory.js';
@@ -231,6 +232,131 @@ const placeOrder = async (req, res) => {
             orderId: newOrder._id
         });
     } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+const placeOrderWallet = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const { userId, items, amount, subtotal, discount, address, voucherCode } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, message: 'Missing user id' });
+        }
+
+        const user = await userModel.findById(userId).session(session);
+        if (!user || (user.walletBalance || 0) < Number(amount)) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.json({ success: false, message: 'Số dư ví không đủ để thanh toán' });
+        }
+
+        if (voucherCode && voucherCode.toUpperCase() === 'BANMOI') {
+            const completedCount = await orderModel.countDocuments({
+                userId,
+                status: 'Delivered'
+            });
+            if (completedCount > 0) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.json({ success: false, message: 'BANMOI only works for the first completed order' });
+            }
+        }
+
+        const normalizedItems = normalizeOrderItems(items);
+
+        if (normalizedItems.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.json({ success: false, message: 'Cart is empty' });
+        }
+
+        if (!amount || Number(amount) <= 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.json({ success: false, message: 'Invalid order amount' });
+        }
+
+        if (!address || typeof address !== 'object' || !validateAddress(address)) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.json({ success: false, message: 'Address is required' });
+        }
+
+        const requestedVariants = buildRequestedVariants(normalizedItems);
+
+        for (const variant of requestedVariants) {
+            const availableStock = await getAvailableStock(variant);
+
+            if (availableStock < variant.quantity) {
+                await session.abortTransaction();
+                session.endSession();
+                if (availableStock <= 0) {
+                    return res.json({
+                        success: false,
+                        message: `${variant.size} / ${variant.color} is out of stock`,
+                    });
+                }
+                return res.json({
+                    success: false,
+                    message: `Only ${availableStock} item(s) left for ${variant.size} / ${variant.color}`,
+                });
+            }
+        }
+
+        // Trừ tiền ví
+        user.walletBalance -= Number(amount);
+        await user.save({ session });
+
+        const orderData = {
+            userId,
+            items: normalizedItems,
+            amount: Number(amount),
+            subtotal: Number(subtotal) || 0,
+            discount: Number(discount) || 0,
+            cogs: 0,
+            profit: 0,
+            inventoryDeducted: false,
+            inventoryDeductedAt: null,
+            inventoryAdjustments: [],
+            address,
+            status: 'Order Placed',
+            paymentMethod: 'Wallet',
+            payment: true, // Thanh toán qua Ví coi như Paid luôn
+            date: Date.now()
+        };
+
+        const newOrder = new orderModel(orderData);
+        await newOrder.save({ session });
+
+        // Ghi Log giao dịch Ví
+        const tx = new walletTransactionModel({
+            userId,
+            type: 'Debit',
+            amount: Number(amount),
+            description: `Thanh toán Đơn hàng #${String(newOrder._id).slice(-8).toUpperCase()}`,
+            relatedOrderId: String(newOrder._id)
+        });
+        await tx.save({ session });
+
+        // Xoá giỏ hàng
+        await userModel.findByIdAndUpdate(userId, { cartData: {} }, { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.json({
+            success: true,
+            message: 'Thanh toán qua Ví thành công',
+            orderId: newOrder._id
+        });
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.log(error);
         res.json({ success: false, message: error.message });
     }
@@ -547,13 +673,49 @@ const sepayIpnHandler = async (req, res) => {
             const status = data.transaction.transaction_status; 
             
             if (status === 'APPROVED') {
-                const order = await orderModel.findById(invoiceOrderId);
-                if (order && !order.payment) {
-                    order.payment = true;
-                    await order.save();
-                    
-                    if (order.userId) { 
-                        await logAction(order.userId, 'SePay Webhook', 'PAYMENT_SUCCESS', `SePay confirmed payment for order #${String(invoiceOrderId).slice(-8)}`, invoiceOrderId);
+                if (String(invoiceOrderId).startsWith('WT_')) {
+                    // Logic xử lý nạp tiền vào ví
+                    // Invoice có dạng: WT_{userId}_{timestamp}
+                    const parts = invoiceOrderId.split('_');
+                    if (parts.length >= 2) {
+                        const userId = parts[1];
+                        const amount = Number(data.transaction.transaction_amount);
+                        
+                        const session = await mongoose.startSession();
+                        session.startTransaction();
+                        try {
+                            const user = await userModel.findById(userId).session(session);
+                            if (user) {
+                                user.walletBalance = (user.walletBalance || 0) + amount;
+                                await user.save({ session });
+
+                                const tx = new walletTransactionModel({
+                                    userId,
+                                    type: 'Credit',
+                                    amount,
+                                    description: `Nạp tiền vào tài khoản Ví (SePay ${data.transaction.transaction_id})`
+                                });
+                                await tx.save({ session });
+                                
+                                await logAction(userId, 'SePay Webhook', 'WALLET_TOPUP', `Topup ${amount} đ thành công`, invoiceOrderId);
+                            }
+                            await session.commitTransaction();
+                            session.endSession();
+                        } catch (err) {
+                            await session.abortTransaction();
+                            session.endSession();
+                            console.error("Lỗi khi xử lý Nạp tiền Wallet IPN: ", err);
+                        }
+                    }
+                } else {
+                    const order = await orderModel.findById(invoiceOrderId);
+                    if (order && !order.payment) {
+                        order.payment = true;
+                        await order.save();
+                        
+                        if (order.userId) { 
+                            await logAction(order.userId, 'SePay Webhook', 'PAYMENT_SUCCESS', `SePay confirmed payment for order #${String(invoiceOrderId).slice(-8)}`, invoiceOrderId);
+                        }
                     }
                 }
             }
@@ -584,4 +746,4 @@ const getAdminPaymentAnalytics = async (req, res) => {
     }
 };
 
-export { placeOrder, placeOrderSePay, sepayIpnHandler, getAdminPaymentAnalytics, allOrders, userOrders, updateStatus, cancelOrder, confirmReceived, deleteOrder, restoreInventoryFromOrder };
+export { placeOrder, placeOrderSePay, sepayIpnHandler, getAdminPaymentAnalytics, restoreInventoryFromOrder, placeOrderWallet, allOrders, userOrders, updateStatus, cancelOrder, confirmReceived, deleteOrder };

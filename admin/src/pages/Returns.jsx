@@ -176,6 +176,23 @@ const Returns = ({ token }) => {
                         </div>
 
                         <div>
+                            <Text className="block text-sm font-semibold text-slate-500 mb-1">Phương thức hoàn tiền:</Text>
+                            {currentReturn.refundMethod === 'Wallet' ? (
+                                <Tag color="green">Ví Điện Tử (Tự động)</Tag>
+                            ) : (
+                                <Tag color="orange">Chuyển Khoản Ngân Hàng</Tag>
+                            )}
+                            
+                            {currentReturn.refundMethod === 'Bank' && currentReturn.bankDetails && (
+                                <div className="mt-2 p-3 bg-slate-50 rounded-lg text-sm text-slate-700">
+                                    <p><strong>Ngân hàng:</strong> {currentReturn.bankDetails.bankName}</p>
+                                    <p><strong>Số tài khoản:</strong> {currentReturn.bankDetails.accountNumber}</p>
+                                    <p><strong>Chủ tài khoản:</strong> {currentReturn.bankDetails.accountName}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
                             <Text className="block text-sm font-semibold text-slate-500 mb-1">Ghi chú Nội bộ (Admin):</Text>
                             <TextArea 
                                 rows={3} 

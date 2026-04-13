@@ -14,12 +14,17 @@ import { formatPhoneValue, splitPhoneValue } from '../lib/phone';
 
 const copy = {
     vi: {
-        delivery1: 'THÔNG TIN',
-        delivery2: 'GIAO HÀNG',
+        title1: 'THÔNG TIN',
+        title2: 'GIAO HÀNG',
         cart1: 'TỔNG',
-        cart2: 'THANH TOÁN',
+        cart2: 'GIỎ HÀNG',
         payment1: 'PHƯƠNG THỨC',
         payment2: 'THANH TOÁN',
+        cashOnDelivery: 'Thanh toán trực tiếp khi nhận hàng',
+        bankTransfer: 'Chuyển khoản SePay',
+        walletTransfer: 'Thanh toán bằng Ví',
+        walletBalance: 'Số dư: ',
+        insufficientBalance: 'Không đủ số dư ví',
         loadAccountError: 'Không thể tải thông tin tài khoản',
         signInRequired: 'Vui lòng đăng nhập để đặt hàng',
         emptyCart: 'Giỏ hàng đang trống',
@@ -53,19 +58,22 @@ const copy = {
         discount: (value) => `Giảm giá (${value}%)`,
         shipping: 'Phí giao hàng',
         total: 'Tổng cộng',
-        cashOnDelivery: 'THANH TOÁN KHI NHẬN HÀNG (COD)',
-        bankTransfer: 'CHUYỂN KHOẢN (MÃ QR TỰ ĐỘNG)',
         processing: 'Đang xử lý...',
         placeOrder: 'Đặt Hàng',
         savedAddressLabel: 'Địa chỉ đã lưu',
     },
     en: {
-        delivery1: 'DELIVERY',
-        delivery2: 'INFORMATION',
+        title1: 'DELIVERY',
+        title2: 'INFORMATION',
         cart1: 'CART',
         cart2: 'TOTALS',
         payment1: 'PAYMENT',
         payment2: 'METHOD',
+        cashOnDelivery: 'Cash on delivery',
+        bankTransfer: 'SEPAY Bank Transfer',
+        walletTransfer: 'Pay via Wallet',
+        walletBalance: 'Balance: ',
+        insufficientBalance: 'Insufficient wallet balance',
         loadAccountError: 'Unable to load account information',
         signInRequired: 'Please sign in to place an order',
         emptyCart: 'Your cart is empty',
@@ -145,6 +153,7 @@ const PlaceOrder = () => {
     const [selectedWard, setSelectedWard] = useState('');
     const [phoneCode, setPhoneCode] = useState('+84');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [walletBalance, setWalletBalance] = useState(0);
 
     const syncPhoneState = (rawPhone = '') => {
         const parsed = splitPhoneValue(rawPhone);
@@ -251,6 +260,15 @@ const PlaceOrder = () => {
                 } else {
                     setUseNewAddress(true);
                     setSaveNewAddress(true);
+                }
+
+                try {
+                    const walletRes = await axios.post(`${backendUrl}/api/wallet/info`, {}, { headers: { token } });
+                    if (walletRes.data.success) {
+                        setWalletBalance(walletRes.data.balance || 0);
+                    }
+                } catch (e) {
+                    console.log('Error fetching wallet balance');
                 }
             } catch (error) {
                 toast.error(error.message || t.loadAccountError);
@@ -490,7 +508,12 @@ const PlaceOrder = () => {
                 voucherCode: appliedVoucher ? appliedVoucher.code : '',
             };
 
-            const endpoint = method === 'banking' ? `${backendUrl}/api/order/place-sepay` : `${backendUrl}/api/order/place`;
+            const endpoint = method === 'banking' 
+                ? `${backendUrl}/api/order/place-sepay` 
+                : method === 'wallet'
+                    ? `${backendUrl}/api/order/place-wallet`
+                    : `${backendUrl}/api/order/place`;
+            
             const response = await axios.post(endpoint, payload, { headers: { token } });
 
             if (response?.data?.success) {
@@ -535,7 +558,7 @@ const PlaceOrder = () => {
             <section className="space-y-6">
                 <div className="section-shell px-5 py-6 sm:px-8 sm:py-8">
                     <div className="mb-8">
-                        <Title text1={t.delivery1} text2={t.delivery2} />
+                        <Title text1={t.title1} text2={t.title2} />
                     </div>
                     <div className="space-y-5">
                         {!accountLoading && savedAddresses.length > 0 ? (
@@ -720,6 +743,17 @@ const PlaceOrder = () => {
                                 <input type="radio" name="paymentMethod" className="sr-only" checked={method === 'banking'} onChange={() => setMethod('banking')} />
                                 <span className={`h-3.5 w-3.5 rounded-full ${method === 'banking' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                                 <p className="text-sm font-medium text-slate-600">{t.bankTransfer}</p>
+                            </label>
+
+                            <label onClick={() => setMethod('wallet')} className={`flex justify-between items-center gap-3 rounded-[20px] border px-4 py-4 cursor-pointer transition ${method === 'wallet' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'} ${(walletBalance < (orderSubtotal - discountAmount + delivery_fee)) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                <div className="flex items-center gap-3">
+                                    <input type="radio" name="paymentMethod" className="sr-only" disabled={walletBalance < (orderSubtotal - discountAmount + delivery_fee)} checked={method === 'wallet'} onChange={() => { if(walletBalance >= (orderSubtotal - discountAmount + delivery_fee)) setMethod('wallet') }} />
+                                    <span className={`h-3.5 w-3.5 rounded-full ${method === 'wallet' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                    <p className="text-sm font-medium text-slate-600">{t.walletTransfer}</p>
+                                </div>
+                                <span className={`text-xs font-bold ${walletBalance < (orderSubtotal - discountAmount + delivery_fee) ? 'text-rose-500' : 'text-slate-800'}`}>
+                                    {t.walletBalance} {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(walletBalance)}
+                                </span>
                             </label>
                         </div>
                     </div>

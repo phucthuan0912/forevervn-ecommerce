@@ -4,12 +4,13 @@ import { restoreInventoryFromOrder } from './orderController.js';
 import { v2 as cloudinary } from 'cloudinary';
 import logAction from '../utils/logger.js';
 import mongoose from 'mongoose';
+import { processRefundToWallet } from './walletController.js';
 
 const requestReturn = async (req, res) => {
     try {
-        const { userId, orderId, reason } = req.body;
+        const { userId, orderId, reason, refundMethod, bankDetails } = req.body;
         
-        if (!userId || !orderId || !reason) {
+        if (!userId || !orderId || !reason || !refundMethod) {
             return res.json({ success: false, message: 'Missing required fields' });
         }
 
@@ -53,6 +54,8 @@ const requestReturn = async (req, res) => {
             images: imagesUrl,
             status: 'Pending',
             refundAmount: order.amount, // Default to full amount
+            refundMethod,
+            bankDetails: bankDetails ? JSON.parse(bankDetails) : {}
         };
 
         const newReturn = new returnModel(returnData);
@@ -146,6 +149,28 @@ const updateReturnStatus = async (req, res) => {
                     order.inventoryAdjustments = [];
                     await order.save({ session });
                 }
+
+                // Tiền bồi hoàn
+                if (returnReq.refundMethod === 'Wallet') {
+                    // Để tránh treo session chéo, ta có thể commitTransaction hiện tại, sau đó gọi hàm processRefundToWallet
+                    // HOẶC gọi trực tiếp logic ở đây. Tốt nhất là uỷ thác cho session này luôn.
+                    const user = await mongoose.model('user').findById(returnReq.userId).session(session);
+                    if (user) {
+                        user.walletBalance = (user.walletBalance || 0) + returnReq.refundAmount;
+                        await user.save({ session });
+                        
+                        const walletTransactionModel = mongoose.model('walletTransaction');
+                        const tx = new walletTransactionModel({
+                            userId: returnReq.userId,
+                            type: 'Credit',
+                            amount: returnReq.refundAmount,
+                            description: `Hoàn tiền hệ thống - Yêu cầu trả hàng #${String(returnId).slice(-8).toUpperCase()}`,
+                            relatedOrderId: order._id
+                        });
+                        await tx.save({ session });
+                    }
+                }
+
             } else if (status === 'Pending') {
                 order.status = 'Return Requested';
                 await order.save({ session });

@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     addresses: { type: [addressSchema], default: [] },
     role:     { type: String, enum: ['Admin', 'Employee', 'Customer'], default: 'Customer' },
     resetOtp: { type: String, default: '' },
-    resetOtpExpireAt: { type: Number, default: 0 }
+    resetOtpExpireAt: { type: Number, default: 0 },
+    walletBalance: { type: Number, default: 0 }
 }, { minimize: false })
 
 // Tránh tạo model mới mỗi lần nodemon restart

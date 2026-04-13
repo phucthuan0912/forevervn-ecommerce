@@ -4,6 +4,7 @@ import adminAuth from '../middleware/adminAuth.js';
 import {
     placeOrder,
     placeOrderSePay,
+    placeOrderWallet,
     sepayIpnHandler,
     getAdminPaymentAnalytics,
     allOrders,
@@ -18,6 +19,7 @@ const orderRouter = express.Router();
 
 orderRouter.post('/place', authUser, placeOrder);
 orderRouter.post('/place-sepay', authUser, placeOrderSePay);
+orderRouter.post('/place-wallet', authUser, placeOrderWallet);
 orderRouter.post('/sepay-ipn', express.json(), sepayIpnHandler);
 
 orderRouter.post('/list', adminAuth, allOrders);

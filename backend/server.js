@@ -19,6 +19,7 @@ import reviewRouter from './routes/reviewRoute.js';
 import importBatchRouter from './routes/importBatchRoute.js';
 import behaviorRouter from './routes/behaviorRouter.js';
 import returnRouter from './routes/returnRoute.js';
+import walletRouter from './routes/walletRoute.js';
 import startStockAlertJob from './utils/stockAlert.js';
 import aiRouter from './routes/aiRouter.js';
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +52,7 @@ app.use('/api/import-batch', importBatchRouter);
 app.use('/api/behavior', behaviorRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/return', returnRouter);
+app.use('/api/wallet', walletRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World! API dang chay...');

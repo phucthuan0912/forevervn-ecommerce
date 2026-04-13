@@ -8,6 +8,8 @@ const returnSchema = new mongoose.Schema(
         images: { type: Array, default: [] }, // Uploaded via Cloudinary
         status: { type: String, required: true, default: 'Pending' }, // Pending, Approved, Rejected, Completed
         refundAmount: { type: Number, required: true },
+        refundMethod: { type: String, enum: ['Wallet', 'Bank'], default: 'Wallet' },
+        bankDetails: { type: Object, default: {} },
         adminNote: { type: String, default: '' },
         date: { type: Number, required: true, default: Date.now }
     },

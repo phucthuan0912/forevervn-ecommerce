@@ -150,6 +150,12 @@ const copy = {
         returnFailed: 'Unable to submit request',
         submitReturn: 'Submit Request',
         cancel: 'Close',
+        refundMethodTitle: 'Refund Method',
+        refundWallet: 'Transfer to E-Wallet (Instant)',
+        refundBank: 'Bank Transfer (Takes time)',
+        bankName: 'Bank Name',
+        accountNumber: 'Account Number',
+        accountName: 'Account Holder Name',
     },
 };
 
@@ -174,6 +180,8 @@ const Orders = () => {
     const [returnModalOrder, setReturnModalOrder] = useState(null);
     const [returnReason, setReturnReason] = useState('');
     const [returnImages, setReturnImages] = useState([]);
+    const [refundMethod, setRefundMethod] = useState('Wallet');
+    const [bankDetails, setBankDetails] = useState({ bankName: '', accountNumber: '', accountName: '' });
     const [submittingReturn, setSubmittingReturn] = useState(false);
 
     const statusLabel = useCallback(
@@ -449,6 +457,10 @@ const Orders = () => {
             for (let i = 0; i < returnImages.length; i++) {
                 formData.append(`image${i + 1}`, returnImages[i]);
             }
+            formData.append('refundMethod', refundMethod);
+            if (refundMethod === 'Bank') {
+                formData.append('bankDetails', JSON.stringify(bankDetails));
+            }
 
             const response = await axios.post(`${backendUrl}/api/return/request`, formData, { headers: { token } });
 
@@ -457,6 +469,8 @@ const Orders = () => {
                 setReturnModalOrder(null);
                 setReturnReason('');
                 setReturnImages([]);
+                setRefundMethod('Wallet');
+                setBankDetails({ bankName: '', accountNumber: '', accountName: '' });
                 fetchOrderData({ silent: true });
             } else {
                 toast.error(response?.data?.message || t.returnFailed);
@@ -769,6 +783,28 @@ const Orders = () => {
                                     </div>
                                 )}
                             </div>
+                            
+                            {/* Chon phuong thuc hoan tien */}
+                            <div className="pt-2 border-t border-slate-100">
+                                <p className='mb-3 text-sm font-semibold text-slate-700'>{t.refundMethodTitle}</p>
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition border-slate-200 hover:border-slate-300">
+                                        <input type="radio" checked={refundMethod === 'Wallet'} onChange={() => setRefundMethod('Wallet')} className="w-4 h-4 text-emerald-500" />
+                                        <span className="text-sm text-slate-700 font-medium">{t.refundWallet}</span>
+                                    </label>
+                                    <label className="flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition border-slate-200 hover:border-slate-300">
+                                        <input type="radio" checked={refundMethod === 'Bank'} onChange={() => setRefundMethod('Bank')} className="w-4 h-4 text-emerald-500" />
+                                        <span className="text-sm text-slate-700 font-medium">{t.refundBank}</span>
+                                    </label>
+                                </div>
+                                {refundMethod === 'Bank' && (
+                                    <div className="mt-3 space-y-3 bg-slate-50 p-4 rounded-2xl">
+                                        <input type="text" placeholder={t.bankName} value={bankDetails.bankName} onChange={e => setBankDetails({...bankDetails, bankName: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
+                                        <input type="text" placeholder={t.accountNumber} value={bankDetails.accountNumber} onChange={e => setBankDetails({...bankDetails, accountNumber: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
+                                        <input type="text" placeholder={t.accountName} value={bankDetails.accountName} onChange={e => setBankDetails({...bankDetails, accountName: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className='mt-6 flex flex-wrap justify-end gap-3 flex-shrink-0 pt-4 border-t border-slate-100'>
                             <button
@@ -780,7 +816,7 @@ const Orders = () => {
                             </button>
                             <button
                                 onClick={handleReturnSubmit}
-                                disabled={submittingReturn || !returnReason.trim()}
+                                disabled={submittingReturn || !returnReason.trim() || (refundMethod === 'Bank' && (!bankDetails.bankName || !bankDetails.accountName || !bankDetails.accountNumber))}
                                 className='rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50'
                                 type='button'
                             >

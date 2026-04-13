@@ -13,6 +13,7 @@ const copyByLanguage = {
         contact: 'Liên hệ',
         account: 'Tài khoản',
         myAccount: 'Tài khoản của tôi',
+        myWallet: 'Ví của tôi',
         orders: 'Đơn hàng',
         logout: 'Đăng xuất',
         login: 'Đăng nhập',
@@ -29,6 +30,7 @@ const copyByLanguage = {
         contact: 'Contact',
         account: 'Account',
         myAccount: 'My Account',
+        myWallet: 'My Wallet',
         orders: 'Orders',
         logout: 'Logout',
         login: 'Login',
@@ -157,6 +159,13 @@ const Navbar = () => {
                                                 {copy.myAccount}
                                             </button>
                                             <button
+                                                onClick={() => navigate('/my-wallet')}
+                                                className="w-full rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-600 hover:bg-slate-900 hover:text-white"
+                                                type="button"
+                                            >
+                                                {copy.myWallet}
+                                            </button>
+                                            <button
                                                 onClick={() => navigate('/orders')}
                                                 className="w-full rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-600 hover:bg-slate-900 hover:text-white"
                                                 type="button"
@@ -282,6 +291,16 @@ const Navbar = () => {
                                     type="button"
                                 >
                                     {copy.myAccount.toUpperCase()}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigate('/my-wallet');
+                                        setVisible(false);
+                                    }}
+                                    className="w-full rounded-[20px] border border-[var(--border)] px-4 py-3 text-left text-sm font-semibold text-slate-600"
+                                    type="button"
+                                >
+                                    {copy.myWallet.toUpperCase()}
                                 </button>
                                 <button
                                     onClick={() => {

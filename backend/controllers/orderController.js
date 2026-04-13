@@ -4,6 +4,15 @@ import userModel from '../models/userModel.js';
 import importBatchModel from '../models/importBatchModel.js';
 import logAction from '../utils/logger.js';
 import { buildInventoryFilter, getAvailableStock, normalizeVariantColor } from '../utils/inventory.js';
+import { SePayPgClient } from 'sepay-pg-node';
+
+const getSepayClient = () => new SePayPgClient({
+    env: 'production',
+    merchant_id: 'SP-LIVE-TN79A866', 
+    secret_key: process.env.SEPAY_SECRET_KEY,
+});
+
+
 
 const DEDUCTION_TRIGGER_STATUSES = new Set(['Packing', 'Shipped', 'Out for Delivery', 'Delivered', 'Received']);
 
@@ -433,4 +442,142 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-export { placeOrder, allOrders, userOrders, updateStatus, cancelOrder, confirmReceived, deleteOrder };
+const placeOrderSePay = async (req, res) => {
+    try {
+        const { userId, items, amount, address, voucherCode } = req.body;
+
+        if (!userId) {
+            return res.json({ success: false, message: 'Missing user id' });
+        }
+
+        if (voucherCode && voucherCode.toUpperCase() === 'BANMOI') {
+            const completedCount = await orderModel.countDocuments({
+                userId,
+                status: 'Delivered'
+            });
+            if (completedCount > 0) {
+                return res.json({ success: false, message: 'BANMOI only works for the first completed order' });
+            }
+        }
+
+        const normalizedItems = normalizeOrderItems(items);
+
+        if (normalizedItems.length === 0) {
+            return res.json({ success: false, message: 'Cart is empty' });
+        }
+
+        if (!amount || Number(amount) <= 0) {
+            return res.json({ success: false, message: 'Invalid order amount' });
+        }
+
+        if (!address || typeof address !== 'object' || !validateAddress(address)) {
+            return res.json({ success: false, message: 'Address is required' });
+        }
+
+        const requestedVariants = buildRequestedVariants(normalizedItems);
+
+        for (const variant of requestedVariants) {
+            const availableStock = await getAvailableStock(variant);
+
+            if (availableStock < variant.quantity) {
+                if (availableStock <= 0) {
+                    return res.json({ success: false, message: `${variant.size} / ${variant.color} is out of stock` });
+                }
+                return res.json({ success: false, message: `Only ${availableStock} item(s) left for ${variant.size} / ${variant.color}` });
+            }
+        }
+
+        const orderData = {
+            userId,
+            items: normalizedItems,
+            amount: Number(amount),
+            cogs: 0,
+            profit: 0,
+            inventoryDeducted: false,
+            inventoryDeductedAt: null,
+            inventoryAdjustments: [],
+            address,
+            status: 'Order Placed',
+            paymentMethod: 'Banking',
+            payment: false,
+            date: Date.now()
+        };
+
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
+
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+        const origin = req.headers.origin || 'http://localhost:5173';
+        const invoiceId = newOrder._id.toString();
+        const checkoutFields = getSepayClient().checkout.initOneTimePaymentFields({
+            payment_method: 'BANK_TRANSFER',
+            order_invoice_number: invoiceId, 
+            order_amount: Number(amount), 
+            currency: 'VND',
+            order_description: 'Thanh toan don hang',
+            success_url: `${origin}/orders`,
+            error_url:   `${origin}/cart`,
+            cancel_url:  `${origin}/cart`,
+        });
+
+        const checkoutURL = getSepayClient().checkout.initCheckoutUrl();
+
+        res.json({
+            success: true,
+            checkoutUrl: checkoutURL,
+            checkoutFields: checkoutFields
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+const sepayIpnHandler = async (req, res) => {
+    try {
+        const data = req.body;
+        
+        if (data.notification_type === 'ORDER_PAID') {
+            const invoiceOrderId = data.order.order_invoice_number;
+            const status = data.transaction.transaction_status; 
+            
+            if (status === 'APPROVED') {
+                const order = await orderModel.findById(invoiceOrderId);
+                if (order && !order.payment) {
+                    order.payment = true;
+                    await order.save();
+                    
+                    if (order.userId) { 
+                        await logAction(order.userId, 'SePay Webhook', 'PAYMENT_SUCCESS', `SePay confirmed payment for order #${String(invoiceOrderId).slice(-8)}`, invoiceOrderId);
+                    }
+                }
+            }
+        }
+        res.status(200).json({ success: true }); 
+    } catch (error) {
+        console.log(error);
+        res.status(200).json({ success: true }); 
+    }
+};
+
+const getAdminPaymentAnalytics = async (req, res) => {
+    try {
+        const stats = await orderModel.aggregate([
+            { $match: { status: { $ne: 'Cancelled' } } }, 
+            { 
+                $group: {
+                    _id: "$paymentMethod", 
+                    totalRevenue: { $sum: "$amount" },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+        res.json({ success: true, stats });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { placeOrder, placeOrderSePay, sepayIpnHandler, getAdminPaymentAnalytics, allOrders, userOrders, updateStatus, cancelOrder, confirmReceived, deleteOrder };

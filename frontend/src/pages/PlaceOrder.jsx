@@ -52,7 +52,8 @@ const copy = {
         discount: (value) => `Giảm giá (${value}%)`,
         shipping: 'Phí giao hàng',
         total: 'Tổng cộng',
-        cashOnDelivery: 'THANH TOÁN KHI NHẬN HÀNG',
+        cashOnDelivery: 'THANH TOÁN KHI NHẬN HÀNG (COD)',
+        bankTransfer: 'CHUYỂN KHOẢN (MÃ QR TỰ ĐỘNG)',
         processing: 'Đang xử lý...',
         placeOrder: 'Đặt Hàng',
         savedAddressLabel: 'Địa chỉ đã lưu',
@@ -98,6 +99,7 @@ const copy = {
         shipping: 'Shipping fee',
         total: 'Total',
         cashOnDelivery: 'CASH ON DELIVERY',
+        bankTransfer: 'BANK TRANSFER (QR CODE)',
         processing: 'Processing...',
         placeOrder: 'Place Order',
         savedAddressLabel: 'Saved address',
@@ -133,6 +135,7 @@ const PlaceOrder = () => {
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState('');
     const [useNewAddress, setUseNewAddress] = useState(false);
+    const [method, setMethod] = useState('cod');
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -485,12 +488,33 @@ const PlaceOrder = () => {
                 voucherCode: appliedVoucher ? appliedVoucher.code : '',
             };
 
-            const response = await axios.post(`${backendUrl}/api/order/place`, payload, { headers: { token } });
+            const endpoint = method === 'banking' ? `${backendUrl}/api/order/place-sepay` : `${backendUrl}/api/order/place`;
+            const response = await axios.post(endpoint, payload, { headers: { token } });
 
             if (response?.data?.success) {
                 if (!isBuyNowMode) {
                     clearLocalCart();
                 }
+                
+                if (method === 'banking' && response.data.checkoutUrl && response.data.checkoutFields) {
+                    const { checkoutUrl, checkoutFields } = response.data;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = checkoutUrl;
+                    
+                    checkoutFields.forEach((field) => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = field.name;
+                        input.value = field.value;
+                        form.appendChild(input);
+                    });
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                    return; // Wait for redirect
+                }
+
                 toast.success(t.orderSuccess);
                 navigate('/orders');
                 return;
@@ -675,9 +699,18 @@ const PlaceOrder = () => {
 
                     <div className="mt-8 rounded-[24px] border border-[var(--border)] bg-white p-5">
                         <Title text1={t.payment1} text2={t.payment2} />
-                        <div className="mt-4 flex items-center gap-3 rounded-[20px] border border-emerald-200 bg-emerald-50 px-4 py-4">
-                            <span className="h-3.5 w-3.5 rounded-full bg-emerald-500" />
-                            <p className="text-sm font-medium text-slate-600">{t.cashOnDelivery}</p>
+                        <div className="mt-4 flex flex-col gap-3">
+                            <label onClick={() => setMethod('cod')} className={`flex items-center gap-3 rounded-[20px] border px-4 py-4 cursor-pointer transition ${method === 'cod' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                                <input type="radio" name="paymentMethod" className="sr-only" checked={method === 'cod'} onChange={() => setMethod('cod')} />
+                                <span className={`h-3.5 w-3.5 rounded-full ${method === 'cod' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                <p className="text-sm font-medium text-slate-600">{t.cashOnDelivery}</p>
+                            </label>
+
+                            <label onClick={() => setMethod('banking')} className={`flex items-center gap-3 rounded-[20px] border px-4 py-4 cursor-pointer transition ${method === 'banking' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+                                <input type="radio" name="paymentMethod" className="sr-only" checked={method === 'banking'} onChange={() => setMethod('banking')} />
+                                <span className={`h-3.5 w-3.5 rounded-full ${method === 'banking' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                <p className="text-sm font-medium text-slate-600">{t.bankTransfer}</p>
+                            </label>
                         </div>
                     </div>
 

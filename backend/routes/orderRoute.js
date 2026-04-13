@@ -3,6 +3,9 @@ import authUser from '../middleware/auth.js';
 import adminAuth from '../middleware/adminAuth.js';
 import {
     placeOrder,
+    placeOrderSePay,
+    sepayIpnHandler,
+    getAdminPaymentAnalytics,
     allOrders,
     userOrders,
     updateStatus,
@@ -14,7 +17,11 @@ import {
 const orderRouter = express.Router();
 
 orderRouter.post('/place', authUser, placeOrder);
+orderRouter.post('/place-sepay', authUser, placeOrderSePay);
+orderRouter.post('/sepay-ipn', express.json(), sepayIpnHandler);
+
 orderRouter.post('/list', adminAuth, allOrders);
+orderRouter.get('/analytics/payments', adminAuth, getAdminPaymentAnalytics);
 orderRouter.post('/status', adminAuth, updateStatus);
 orderRouter.post('/delete', adminAuth, deleteOrder);
 orderRouter.post('/userorders', authUser, userOrders);

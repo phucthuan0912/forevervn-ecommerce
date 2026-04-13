@@ -515,7 +515,7 @@ const placeOrderSePay = async (req, res) => {
             order_invoice_number: invoiceId, 
             order_amount: Number(amount), 
             currency: 'VND',
-            order_description: 'Thanh toán đơn hàng',
+            order_description: 'Thanh toan don hang',
             success_url: `${origin}/orders`,
             error_url:   `${origin}/cart`,
             cancel_url:  `${origin}/cart`,

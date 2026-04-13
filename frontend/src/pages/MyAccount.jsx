@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { ShopContext } from '../context/ShopContext';
 import { useLanguage } from '../context/LanguageContext';
 import PhoneField from '../components/PhoneField';
+import SearchableSelect from '../components/SearchableSelect';
 import { buildAddressSummary, emptyAddress, sanitizeAddressPayload } from '../lib/address';
 import { formatPhoneValue, splitPhoneValue } from '../lib/phone';
 
@@ -683,49 +684,34 @@ const MyAccount = () => {
                         />
 
                         <div className="grid gap-4 sm:grid-cols-3">
-                            <select
+                            <SearchableSelect
                                 value={selectedProv}
                                 onChange={onProvinceChange}
-                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white"
+                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                placeholder={t.province}
                                 required
-                            >
-                                <option value="">{t.province}</option>
-                                {provinces.map((province) => (
-                                    <option key={province.code} value={province.code}>
-                                        {province.name}
-                                    </option>
-                                ))}
-                            </select>
+                                options={provinces.map((province) => ({ value: province.code, label: province.name }))}
+                            />
 
-                            <select
+                            <SearchableSelect
                                 value={selectedDist}
                                 onChange={onDistrictChange}
                                 disabled={!selectedProv}
-                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white disabled:opacity-50"
+                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                placeholder={t.district}
                                 required
-                            >
-                                <option value="">{t.district}</option>
-                                {districts.map((district) => (
-                                    <option key={district.code} value={district.code}>
-                                        {district.name}
-                                    </option>
-                                ))}
-                            </select>
+                                options={districts.map((district) => ({ value: district.code, label: district.name }))}
+                            />
 
-                            <select
+                            <SearchableSelect
                                 value={selectedWard}
                                 onChange={onWardChange}
                                 disabled={!selectedDist}
-                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white disabled:opacity-50"
+                                className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                placeholder={t.ward}
                                 required
-                            >
-                                <option value="">{t.ward}</option>
-                                {wards.map((ward) => (
-                                    <option key={ward.code} value={ward.code}>
-                                        {ward.name}
-                                    </option>
-                                ))}
-                            </select>
+                                options={wards.map((ward) => ({ value: ward.code, label: ward.name }))}
+                            />
                         </div>
 
                         <input

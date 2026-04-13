@@ -152,7 +152,7 @@ const hasLegacyInventoryDeduction = (order) =>
 
 const placeOrder = async (req, res) => {
     try {
-        const { userId, items, amount, address, voucherCode } = req.body;
+        const { userId, items, amount, subtotal, discount, address, voucherCode } = req.body;
 
         if (!userId) {
             return res.json({ success: false, message: 'Missing user id' });
@@ -206,6 +206,8 @@ const placeOrder = async (req, res) => {
             userId,
             items: normalizedItems,
             amount: Number(amount),
+            subtotal: Number(subtotal) || 0,
+            discount: Number(discount) || 0,
             cogs: 0,
             profit: 0,
             inventoryDeducted: false,
@@ -444,7 +446,7 @@ const deleteOrder = async (req, res) => {
 
 const placeOrderSePay = async (req, res) => {
     try {
-        const { userId, items, amount, address, voucherCode } = req.body;
+        const { userId, items, amount, subtotal, discount, address, voucherCode } = req.body;
 
         if (!userId) {
             return res.json({ success: false, message: 'Missing user id' });
@@ -491,6 +493,8 @@ const placeOrderSePay = async (req, res) => {
             userId,
             items: normalizedItems,
             amount: Number(amount),
+            subtotal: Number(subtotal) || 0,
+            discount: Number(discount) || 0,
             cogs: 0,
             profit: 0,
             inventoryDeducted: false,

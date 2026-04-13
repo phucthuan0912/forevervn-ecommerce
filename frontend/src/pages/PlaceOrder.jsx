@@ -6,6 +6,7 @@ import { ShopContext } from '../context/ShopContext';
 import { useLanguage } from '../context/LanguageContext';
 import Title from '../components/Title';
 import PhoneField from '../components/PhoneField';
+import SearchableSelect from '../components/SearchableSelect';
 import { getRegionByProvince, getShippingFeeByRegion } from '../data/regions';
 import { buildAddressSummary, emptyAddress, isAddressComplete, sanitizeAddressPayload } from '../lib/address';
 import { formatMoney } from '../lib/locale';
@@ -484,6 +485,7 @@ const PlaceOrder = () => {
                     color: item.color === 'Any' ? '' : item.color,
                 })),
                 amount: orderSubtotal - discountAmount + delivery_fee,
+                subtotal: orderSubtotal,
                 discount: discountAmount,
                 voucherCode: appliedVoucher ? appliedVoucher.code : '',
             };
@@ -613,26 +615,34 @@ const PlaceOrder = () => {
                                     />
                                     <input name="email" value={formData.email} onChange={handleChange} className="sm:col-span-2 rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none" type="email" placeholder={t.email} required={useNewAddress || savedAddresses.length === 0} />
 
-                                    <select value={selectedProv} onChange={onProvinceChange} className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white" required={useNewAddress || savedAddresses.length === 0}>
-                                        <option value="">{t.province}</option>
-                                        {provinces.map((province) => (
-                                            <option key={province.code} value={province.code}>{province.name}</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        value={selectedProv}
+                                        onChange={onProvinceChange}
+                                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                        placeholder={t.province}
+                                        required={useNewAddress || savedAddresses.length === 0}
+                                        options={provinces.map(p => ({ value: p.code, label: p.name }))}
+                                    />
 
-                                    <select value={selectedDist} onChange={onDistrictChange} disabled={!selectedProv} className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white disabled:opacity-50" required={useNewAddress || savedAddresses.length === 0}>
-                                        <option value="">{t.district}</option>
-                                        {districts.map((district) => (
-                                            <option key={district.code} value={district.code}>{district.name}</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        value={selectedDist}
+                                        onChange={onDistrictChange}
+                                        disabled={!selectedProv}
+                                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                        placeholder={t.district}
+                                        required={useNewAddress || savedAddresses.length === 0}
+                                        options={districts.map(d => ({ value: d.code, label: d.name }))}
+                                    />
 
-                                    <select value={selectedWard} onChange={onWardChange} disabled={!selectedDist} className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white disabled:opacity-50" required={useNewAddress || savedAddresses.length === 0}>
-                                        <option value="">{t.ward}</option>
-                                        {wards.map((ward) => (
-                                            <option key={ward.code} value={ward.code}>{ward.name}</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        value={selectedWard}
+                                        onChange={onWardChange}
+                                        disabled={!selectedDist}
+                                        className="rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none bg-white font-normal"
+                                        placeholder={t.ward}
+                                        required={useNewAddress || savedAddresses.length === 0}
+                                        options={wards.map(w => ({ value: w.code, label: w.name }))}
+                                    />
 
                                     <input name="addressDetail" value={formData.addressDetail} onChange={handleChange} className="sm:col-span-2 rounded-[20px] border border-[var(--border)] px-4 py-4 text-sm outline-none" type="text" placeholder={t.addressDetail} required={useNewAddress || savedAddresses.length === 0} />
                                 </div>

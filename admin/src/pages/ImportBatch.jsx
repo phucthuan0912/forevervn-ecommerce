@@ -23,6 +23,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Alert,
   Statistic,
   Table,
   Tag,
@@ -709,6 +710,7 @@ const ImportBatch = ({ token, backendUrl: backendUrlFromProps }) => {
                 label='Remaining Quantity'
                 name='remainingQty'
                 rules={[{ required: true, message: 'Please enter remaining quantity' }]}
+                help={<div className="mt-2 text-rose-600 font-medium">Lưu ý: Không cộng dồn sản phẩm MỚI vào lô cũ. Hãy tạo "New Batch" (Tạo lô mới) để không bị hỏng báo cáo tính Lãi/Lỗ!</div>}
               >
                 <InputNumber
                   size='large'

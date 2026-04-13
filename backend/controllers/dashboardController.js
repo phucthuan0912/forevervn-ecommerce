@@ -49,6 +49,7 @@ const getDashboardStats = async (req, res) => {
         let totalRevenue = 0;
         let totalCOGS = 0;
         let totalProfit = 0;
+        let totalDiscount = 0;
         
         let weeklyRevenue = 0;
         let monthlyRevenue = 0;
@@ -59,21 +60,24 @@ const getDashboardStats = async (req, res) => {
             const amount = Number(order.amount) || 0;
             const cogs = Number(order.cogs) || 0;
             const profit = Number(order.profit) || 0;
+            const discount = Number(order.discount) || 0;
 
             totalRevenue += amount;
             totalCOGS += cogs;
             totalProfit += profit;
+            totalDiscount += discount;
 
             if (orderDate >= startOfWeek) weeklyRevenue += amount;
             if (orderDate >= startOfMonth) monthlyRevenue += amount;
             if (orderDate >= startOfYear) yearlyRevenue += amount;
 
             const monthYear = `${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
-            if (!acc[monthYear]) acc[monthYear] = { revenue: 0, cogs: 0, profit: 0 };
+            if (!acc[monthYear]) acc[monthYear] = { revenue: 0, cogs: 0, profit: 0, discount: 0 };
             
             acc[monthYear].revenue += amount;
             acc[monthYear].cogs += cogs;
             acc[monthYear].profit += profit;
+            acc[monthYear].discount += discount;
             
             return acc;
         }, {});
@@ -101,6 +105,7 @@ const getDashboardStats = async (req, res) => {
                 totalRevenue,
                 totalCOGS,
                 totalProfit,
+                totalDiscount,
                 grossMargin: totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(2) : 0,
                 weeklyRevenue,
                 monthlyRevenue,

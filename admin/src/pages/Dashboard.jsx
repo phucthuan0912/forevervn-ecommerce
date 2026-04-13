@@ -46,6 +46,7 @@ const statSchema = z
   .object({
     totalRevenue: numberLike,
     totalProfit: numberLike,
+    totalDiscount: numberLike,
     totalCustomers: numberLike,
     pendingOrders: numberLike,
     grossMargin: numberLike,
@@ -152,6 +153,13 @@ const topCardPalettes = [
     iconWrap: 'bg-[#FBF4E7] text-[#9A7220]',
     border: 'border-[#E4D2B1]',
     glow: 'shadow-[0_18px_45px_rgba(154,114,32,0.10)]',
+  },
+  {
+    card: 'from-[#F4F1FA] to-[#E3D9F2]',
+    iconFrame: 'bg-white/92 ring-1 ring-white/80 shadow-[0_16px_36px_rgba(139,92,246,0.18)]',
+    iconWrap: 'bg-[#EDE7F6] text-[#6D28D9]',
+    border: 'border-[#D8B4E2]',
+    glow: 'shadow-[0_18px_45px_rgba(109,40,217,0.10)]',
   },
 ]
 
@@ -453,6 +461,13 @@ const Dashboard = ({ token, backendUrl: backendUrlFromProps }) => {
         sublabel: 'Store sales',
         value: currencyFormatter.format(stats.totalRevenue || 0),
         icon: 'mdi:cash-multiple',
+      },
+      {
+        key: 'discount',
+        label: 'Total Discount',
+        sublabel: 'Customer codes applied',
+        value: currencyFormatter.format(stats.totalDiscount || 0),
+        icon: 'mdi:ticket-percent',
       },
       {
         key: 'profit',

@@ -508,14 +508,14 @@ const placeOrderSePay = async (req, res) => {
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        const origin = req.headers.origin || 'http://localhost:5173';
+        const origin = req.headers.origin || 'https://forevervn-ecommerce.vercel.app';
         const invoiceId = newOrder._id.toString();
         const checkoutFields = getSepayClient().checkout.initOneTimePaymentFields({
             payment_method: 'BANK_TRANSFER',
             order_invoice_number: invoiceId, 
             order_amount: Number(amount), 
             currency: 'VND',
-            order_description: 'Thanh toan don hang',
+            order_description: 'Thanh toán đơn hàng',
             success_url: `${origin}/orders`,
             error_url:   `${origin}/cart`,
             cancel_url:  `${origin}/cart`,

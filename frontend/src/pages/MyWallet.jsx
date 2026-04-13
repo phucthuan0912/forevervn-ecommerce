@@ -84,7 +84,21 @@ const MyWallet = () => {
             );
 
             if (data.success && data.checkoutUrl) {
-                window.location.replace(data.checkoutUrl);
+                const { checkoutUrl, checkoutFields } = data;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = checkoutUrl;
+                
+                Object.entries(checkoutFields).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
             } else {
                 toast.error(data.message || 'Lỗi tạo giao dịch nạp tiền');
             }
@@ -117,22 +131,35 @@ const MyWallet = () => {
                         </h2>
                     </div>
 
-                    <div className="relative z-10 flex gap-3">
-                        <input
-                            type="number"
-                            min="10000"
-                            placeholder={t.topupAmount}
-                            value={topupAmount}
-                            onChange={(e) => setTopupAmount(e.target.value)}
-                            className="bg-slate-800 text-white border border-slate-700 rounded-full px-5 py-3 outline-none text-sm font-medium w-[200px]"
-                        />
-                        <button
-                            onClick={handleTopUp}
-                            disabled={submitting}
-                            className="bg-white text-slate-900 rounded-full px-6 py-3 text-sm font-bold shadow-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
-                        >
-                            {submitting ? t.processing : t.topup}
-                        </button>
+                    <div className="relative z-10 flex flex-col gap-3">
+                        <div className="flex gap-2 mb-1">
+                            {[50000, 100000, 200000, 500000].map(amt => (
+                                <button
+                                    key={amt}
+                                    onClick={() => setTopupAmount(String(amt))}
+                                    className="bg-slate-800/60 hover:bg-slate-700 text-slate-300 rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur-sm transition-colors border border-slate-700/50"
+                                >
+                                    +{new Intl.NumberFormat('vi-VN').format(amt)}đ
+                                </button>
+                            ))}
+                        </div>
+                        <div className="flex gap-3 w-full">
+                            <input
+                                type="number"
+                                min="10000"
+                                placeholder={t.topupAmount}
+                                value={topupAmount}
+                                onChange={(e) => setTopupAmount(e.target.value)}
+                                className="bg-slate-800 text-white border border-slate-700 rounded-full px-5 py-3 outline-none text-sm font-medium flex-1 h-[48px]"
+                            />
+                            <button
+                                onClick={handleTopUp}
+                                disabled={submitting}
+                                className="bg-white text-slate-900 rounded-full px-6 py-3 text-sm font-bold shadow-[0_4px_14px_0_rgba(255,255,255,0.39)] hover:bg-slate-100 hover:shadow-[0_6px_20px_rgba(255,255,255,0.23)] transition-all disabled:opacity-50 h-[48px] whitespace-nowrap"
+                            >
+                                {submitting ? t.processing : t.topup}
+                            </button>
+                        </div>
                     </div>
                 </div>
 

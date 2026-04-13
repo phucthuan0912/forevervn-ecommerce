@@ -502,11 +502,11 @@ const PlaceOrder = () => {
                     form.method = 'POST';
                     form.action = checkoutUrl;
                     
-                    checkoutFields.forEach((field) => {
+                    Object.entries(checkoutFields).forEach(([key, value]) => {
                         const input = document.createElement('input');
                         input.type = 'hidden';
-                        input.name = field.name;
-                        input.value = field.value;
+                        input.name = key;
+                        input.value = value;
                         form.appendChild(input);
                     });
                     

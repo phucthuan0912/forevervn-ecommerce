@@ -27,8 +27,6 @@ import {
   compactStatCardClass,
   compactStatsRowClass,
   getSelectPopupContainer,
-  compactStatsRowClass,
-  getSelectPopupContainer,
   nativeSelectClass,
   pageShellClass,
 } from '../lib/adminAntd'

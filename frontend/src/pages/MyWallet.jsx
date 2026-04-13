@@ -3,7 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Title from '../components/Title';
-import useLanguage from '../hooks/useLanguage';
+import { useLanguage } from '../context/LanguageContext';
 
 const copy = {
     vi: {

@@ -7,6 +7,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   InboxOutlined,
+  PictureOutlined,
   PlusOutlined,
   ShoppingOutlined,
   WalletOutlined,
@@ -229,6 +230,7 @@ const ImportBatch = ({ token, backendUrl: backendUrlFromProps }) => {
     () => products.find((product) => product._id === formData.productId) || null,
     [formData.productId, products],
   )
+  const selectedProductImage = useMemo(() => normalizeImage(selectedProduct?.image), [selectedProduct])
 
   const selectedProductSizes = useMemo(() => {
     if (!Array.isArray(selectedProduct?.sizes)) return []
@@ -283,18 +285,39 @@ const ImportBatch = ({ token, backendUrl: backendUrlFromProps }) => {
       {
         title: 'Product Base',
         key: 'product',
-        render: (_, batch) => (
-          <div>
-            <Text strong style={{ color: '#0f172a' }}>
-              {getProductName(batch.productId)}
-            </Text>
-            <div>
-              <Text type='secondary' style={{ fontSize: 12 }}>
-                #{String(batch._id || '').slice(-6).toUpperCase()}
-              </Text>
+        width: 320,
+        render: (_, batch) => {
+          const product = products.find((item) => item._id === batch.productId)
+          const productImage = normalizeImage(product?.image)
+
+          return (
+            <div className='flex items-start gap-3'>
+              <div className='flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50'>
+                {productImage ? (
+                  <img
+                    src={productImage}
+                    alt={product?.name || getProductName(batch.productId)}
+                    width={48}
+                    height={48}
+                    className='h-12 w-12 object-cover'
+                  />
+                ) : (
+                  <PictureOutlined style={{ color: '#cbd5e1', fontSize: 16 }} />
+                )}
+              </div>
+              <div className='min-w-0'>
+                <Text strong style={{ color: '#0f172a' }}>
+                  {getProductName(batch.productId)}
+                </Text>
+                <div>
+                  <Text type='secondary' style={{ fontSize: 12 }}>
+                    #{String(batch._id || '').slice(-6).toUpperCase()}
+                  </Text>
+                </div>
+              </div>
             </div>
-          </div>
-        ),
+          )
+        },
       },
       {
         title: 'Variant',
@@ -397,7 +420,7 @@ const ImportBatch = ({ token, backendUrl: backendUrlFromProps }) => {
         ),
       },
     ],
-    [deletingBatchId, editForm, getProductName, handleDeleteBatch],
+    [deletingBatchId, editForm, getProductName, handleDeleteBatch, products],
   )
 
   return (
@@ -512,11 +535,26 @@ const ImportBatch = ({ token, backendUrl: backendUrlFromProps }) => {
               {selectedProduct ? (
                 <div className='mb-4 rounded-2xl border border-[#f2c99b] bg-[#fff1df] px-4 py-4'>
                   <div className='flex flex-wrap items-start justify-between gap-3'>
-                    <div>
-                      <div className='text-sm font-semibold text-slate-900'>{selectedProduct.name}</div>
-                      <div className='mt-1 text-xs text-amber-800'>
-                        Selling price đang để bán: <span className='font-semibold'>{formatVnd(selectedProduct.price)}</span>
+                    <div className='flex min-w-0 items-start gap-3'>
+                      <div className='flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-amber-200 bg-white/70'>
+                        {selectedProductImage ? (
+                          <img
+                            src={selectedProductImage}
+                            alt={selectedProduct.name}
+                            width={64}
+                            height={64}
+                            className='h-16 w-16 object-cover'
+                          />
+                        ) : (
+                          <PictureOutlined style={{ color: '#cbd5e1', fontSize: 20 }} />
+                        )}
                       </div>
+                      <div className='min-w-0'>
+                        <div className='text-sm font-semibold text-slate-900'>{selectedProduct.name}</div>
+                        <div className='mt-1 text-xs text-amber-800'>
+                        Selling price đang để bán: <span className='font-semibold'>{formatVnd(selectedProduct.price)}</span>
+                        </div>
+                    </div>
                     </div>
                     <Tag
                       style={{

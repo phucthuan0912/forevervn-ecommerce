@@ -81,10 +81,26 @@ const copy = {
         returnOrder: 'Trả hàng/Hoàn tiền',
         returnReasonPlaceholder: 'Vui lòng ghi rõ lý do trả hàng (hàng lỗi, rách, không đúng mẫu...)...',
         returnImages: 'Tải ảnh minh chứng (tối đa 4 ảnh)',
+        returnImagesHint: 'Chọn tối đa 4 ảnh để shop duyệt nhanh hơn.',
+        returnImagesLimit: 'Tối đa 4 ảnh / Max 4 images',
         returnSuccess: 'Đã gửi yêu cầu, vui lòng chờ duyệt',
         returnFailed: 'Không thể gửi yêu cầu',
+        returnReasonLabel: 'Lý do hoàn trả',
+        returnReasonHint: 'Mô tả rõ lỗi sản phẩm, sai size hoặc lý do bạn muốn hoàn.',
+        returnOrderSummary: 'Thông tin đơn hoàn',
         submitReturn: 'Gửi yêu cầu',
         cancel: 'Đóng',
+        refundMethodTitle: 'Phương thức hoàn tiền',
+        refundWallet: 'Hoàn về ví điện tử',
+        refundWalletHint: 'Nhận tiền nhanh sau khi shop xác nhận hoàn tất.',
+        refundBank: 'Hoàn về tài khoản ngân hàng',
+        refundBankHint: 'Dùng khi bạn muốn nhận tiền trực tiếp qua ngân hàng.',
+        bankDetailsTitle: 'Thông tin tài khoản nhận hoàn',
+        bankName: 'Tên ngân hàng',
+        accountNumber: 'Số tài khoản',
+        accountName: 'Tên chủ tài khoản',
+        bankDetailsRequired: 'Vui lòng nhập đủ thông tin tài khoản hoàn tiền',
+        removeImage: 'Xóa',
     },
     en: {
         title1: 'MY',
@@ -146,21 +162,32 @@ const copy = {
         returnOrder: 'Return/Refund',
         returnReasonPlaceholder: 'Please detail the reason (defective, wrong size, torn...)...',
         returnImages: 'Upload evidence images (max 4)',
+        returnImagesHint: 'Upload up to 4 photos that clearly show the issue.',
+        returnImagesLimit: 'Max 4 images',
         returnSuccess: 'Return request submitted, pending review',
         returnFailed: 'Unable to submit request',
+        returnReasonLabel: 'Return reason',
+        returnReasonHint: 'Describe the issue clearly so the shop can review faster.',
+        returnOrderSummary: 'Return order summary',
         submitReturn: 'Submit Request',
         cancel: 'Close',
         refundMethodTitle: 'Refund Method',
         refundWallet: 'Transfer to E-Wallet (Instant)',
+        refundWalletHint: 'Fastest option after the return is confirmed.',
         refundBank: 'Bank Transfer (Takes time)',
+        refundBankHint: 'Use this if you want the refund sent to your bank account.',
+        bankDetailsTitle: 'Refund account details',
         bankName: 'Bank Name',
         accountNumber: 'Account Number',
         accountName: 'Account Holder Name',
+        bankDetailsRequired: 'Please enter complete bank account details',
+        removeImage: 'Remove',
     },
 };
 
 const normalizeColor = (value) => String(value || 'Any');
 const normalizeSize = (value) => String(value || 'Free');
+const EMPTY_BANK_DETAILS = { bankName: '', accountNumber: '', accountName: '' };
 
 const Orders = () => {
     const { backendUrl, token, logout, navigate, products, cartItems, updateCartQty, getProductStock } = useContext(ShopContext);
@@ -181,8 +208,63 @@ const Orders = () => {
     const [returnReason, setReturnReason] = useState('');
     const [returnImages, setReturnImages] = useState([]);
     const [refundMethod, setRefundMethod] = useState('Wallet');
-    const [bankDetails, setBankDetails] = useState({ bankName: '', accountNumber: '', accountName: '' });
+    const [bankDetails, setBankDetails] = useState({ ...EMPTY_BANK_DETAILS });
     const [submittingReturn, setSubmittingReturn] = useState(false);
+
+    const returnImagePreviews = useMemo(
+        () =>
+            returnImages.map((file, index) => ({
+                id: `${file.name}-${file.size}-${index}`,
+                name: file.name,
+                url: URL.createObjectURL(file),
+            })),
+        [returnImages],
+    );
+
+    useEffect(() => {
+        return () => {
+            returnImagePreviews.forEach((item) => URL.revokeObjectURL(item.url));
+        };
+    }, [returnImagePreviews]);
+
+    const isBankRefundInvalid =
+        refundMethod === 'Bank' &&
+        ['bankName', 'accountNumber', 'accountName'].some((key) => !String(bankDetails[key] || '').trim());
+
+    const closeReturnModal = useCallback(() => {
+        setReturnModalOrder(null);
+        setReturnReason('');
+        setReturnImages([]);
+        setRefundMethod('Wallet');
+        setBankDetails({ ...EMPTY_BANK_DETAILS });
+    }, []);
+
+    const openReturnModal = useCallback((order) => {
+        setReturnModalOrder(order);
+        setReturnReason('');
+        setReturnImages([]);
+        setRefundMethod('Wallet');
+        setBankDetails({ ...EMPTY_BANK_DETAILS });
+    }, []);
+
+    const handleReturnImagesChange = useCallback(
+        (event) => {
+            const files = Array.from(event.target.files || []);
+
+            if (files.length > 4) {
+                toast.error(t.returnImagesLimit);
+                event.target.value = '';
+                return;
+            }
+
+            setReturnImages(files);
+        },
+        [t.returnImagesLimit],
+    );
+
+    const handleRemoveReturnImage = useCallback((index) => {
+        setReturnImages((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+    }, []);
 
     const statusLabel = useCallback(
         (status) => t.statuses[status] || status || t.unknown,
@@ -447,6 +529,10 @@ const Orders = () => {
     const handleReturnSubmit = async (e) => {
         e.preventDefault();
         if (!token || !returnModalOrder || !returnReason.trim() || submittingReturn) return;
+        if (isBankRefundInvalid) {
+            toast.error(t.bankDetailsRequired);
+            return;
+        }
 
         try {
             setSubmittingReturn(true);
@@ -459,18 +545,21 @@ const Orders = () => {
             }
             formData.append('refundMethod', refundMethod);
             if (refundMethod === 'Bank') {
-                formData.append('bankDetails', JSON.stringify(bankDetails));
+                formData.append(
+                    'bankDetails',
+                    JSON.stringify({
+                        bankName: String(bankDetails.bankName || '').trim(),
+                        accountNumber: String(bankDetails.accountNumber || '').trim(),
+                        accountName: String(bankDetails.accountName || '').trim(),
+                    }),
+                );
             }
 
             const response = await axios.post(`${backendUrl}/api/return/request`, formData, { headers: { token } });
 
             if (response?.data?.success) {
                 toast.success(t.returnSuccess || response.data.message);
-                setReturnModalOrder(null);
-                setReturnReason('');
-                setReturnImages([]);
-                setRefundMethod('Wallet');
-                setBankDetails({ bankName: '', accountNumber: '', accountName: '' });
+                closeReturnModal();
                 fetchOrderData({ silent: true });
             } else {
                 toast.error(response?.data?.message || t.returnFailed);
@@ -707,7 +796,7 @@ const Orders = () => {
 
                                         {canReturn ? (
                                             <button
-                                                onClick={() => setReturnModalOrder(order)}
+                                                onClick={() => openReturnModal(order)}
                                                 className='rounded-full border border-orange-200 bg-orange-50 px-5 py-3 text-sm font-semibold text-orange-600 hover:bg-orange-500 hover:text-white'
                                                 type='button'
                                             >
@@ -734,13 +823,13 @@ const Orders = () => {
 
             {returnModalOrder && (
                 <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm'>
-                    <div className='w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]'>
-                        <div className='flex items-center justify-between mb-4 flex-shrink-0'>
+                    <div className='flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl'>
+                        <div className='flex items-center justify-between border-b border-slate-100 px-6 py-5 sm:px-7'>
                             <h3 className='text-lg font-bold text-slate-900'>
                                 {t.returnOrder} - #{String(returnModalOrder._id).slice(-8).toUpperCase()}
                             </h3>
                             <button
-                                onClick={() => setReturnModalOrder(null)}
+                                onClick={closeReturnModal}
                                 className='rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
                             >
                                 <svg xmlns='http://www.w3.org/2000/svg' className='h-5 w-5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -748,67 +837,173 @@ const Orders = () => {
                                 </svg>
                             </button>
                         </div>
-                        <div className='overflow-y-auto flex-1 space-y-4 pr-2'>
-                            <div>
-                                <textarea
-                                    className='w-full rounded-2xl border border-slate-200 p-4 text-sm outline-none focus:border-slate-400 min-h-[120px]'
-                                    placeholder={t.returnReasonPlaceholder}
-                                    value={returnReason}
-                                    onChange={(e) => setReturnReason(e.target.value)}
-                                ></textarea>
-                            </div>
-                            <div>
-                                <p className='mb-2 text-sm font-semibold text-slate-700'>{t.returnImages}</p>
-                                <input
-                                    type='file'
-                                    multiple
-                                    accept='image/*'
-                                    onChange={(e) => {
-                                        const files = Array.from(e.target.files);
-                                        if (files.length > 4) {
-                                            toast.error('Tối đa 4 ảnh / Max 4 images');
-                                            return;
-                                        }
-                                        setReturnImages(files);
-                                    }}
-                                    className='block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100'
-                                />
-                                {returnImages.length > 0 && (
-                                    <div className='mt-3 flex gap-2 flex-wrap'>
-                                        {returnImages.map((img, i) => (
-                                            <div key={i} className='h-16 w-16 overflow-hidden rounded-xl border border-slate-100'>
-                                                <img src={URL.createObjectURL(img)} className='h-full w-full object-cover' alt='Preview' />
+                        <div className='flex-1 overflow-y-auto px-6 py-5 sm:px-7'>
+                            <div className='space-y-5'>
+                                <div className='rounded-3xl border border-slate-200 bg-slate-50/80 p-4'>
+                                    <div className='flex flex-wrap items-start justify-between gap-3'>
+                                        <div>
+                                            <p className='text-xs font-semibold uppercase tracking-[0.16em] text-slate-500'>{t.returnOrderSummary}</p>
+                                            <p className='mt-2 text-lg font-bold text-slate-900'>#{String(returnModalOrder._id).slice(-8).toUpperCase()}</p>
+                                        </div>
+                                        <div className='rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm'>
+                                            {t.itemsCount((returnModalOrder.items || []).length)} • {formatMoney(Number(returnModalOrder.amount || 0), language)}
+                                        </div>
+                                    </div>
+
+                                    <div className='mt-4 grid gap-3 sm:grid-cols-2'>
+                                        {(returnModalOrder.items || []).slice(0, 2).map((item, index) => (
+                                            <div
+                                                key={`${String(item?._id || item?.id || item?.name || index)}-${index}`}
+                                                className='flex items-center gap-3 rounded-2xl bg-white p-3'
+                                            >
+                                                <img
+                                                    src={getItemImage(item.image)}
+                                                    alt={item.name || 'Product'}
+                                                    className='h-16 w-14 rounded-2xl object-cover'
+                                                />
+                                                <div className='min-w-0'>
+                                                    <p className='truncate text-sm font-semibold text-slate-900'>{item.name}</p>
+                                                    <p className='mt-1 text-xs text-slate-500'>
+                                                        {formatMoney(Number(item.price || 0), language)} • {t.quantity}: {Number(item.quantity || 0)}
+                                                    </p>
+                                                    <p className='mt-1 text-xs text-slate-400'>
+                                                        {t.size}: {item.size || 'Free'}
+                                                    </p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
-                                )}
-                            </div>
-                            
-                            {/* Chon phuong thuc hoan tien */}
-                            <div className="pt-2 border-t border-slate-100">
-                                <p className='mb-3 text-sm font-semibold text-slate-700'>{t.refundMethodTitle}</p>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition border-slate-200 hover:border-slate-300">
-                                        <input type="radio" checked={refundMethod === 'Wallet'} onChange={() => setRefundMethod('Wallet')} className="w-4 h-4 text-emerald-500" />
-                                        <span className="text-sm text-slate-700 font-medium">{t.refundWallet}</span>
-                                    </label>
-                                    <label className="flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition border-slate-200 hover:border-slate-300">
-                                        <input type="radio" checked={refundMethod === 'Bank'} onChange={() => setRefundMethod('Bank')} className="w-4 h-4 text-emerald-500" />
-                                        <span className="text-sm text-slate-700 font-medium">{t.refundBank}</span>
-                                    </label>
                                 </div>
-                                {refundMethod === 'Bank' && (
-                                    <div className="mt-3 space-y-3 bg-slate-50 p-4 rounded-2xl">
-                                        <input type="text" placeholder={t.bankName} value={bankDetails.bankName} onChange={e => setBankDetails({...bankDetails, bankName: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
-                                        <input type="text" placeholder={t.accountNumber} value={bankDetails.accountNumber} onChange={e => setBankDetails({...bankDetails, accountNumber: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
-                                        <input type="text" placeholder={t.accountName} value={bankDetails.accountName} onChange={e => setBankDetails({...bankDetails, accountName: e.target.value})} className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none" required />
+
+                                <div>
+                                    <p className='mb-2 text-sm font-semibold text-slate-700'>{t.returnReasonLabel}</p>
+                                    <p className='mb-3 text-xs text-slate-500'>{t.returnReasonHint}</p>
+                                    <textarea
+                                        className='min-h-[136px] w-full rounded-3xl border border-slate-200 px-4 py-4 text-sm outline-none transition focus:border-slate-400'
+                                        placeholder={t.returnReasonPlaceholder}
+                                        value={returnReason}
+                                        onChange={(e) => setReturnReason(e.target.value)}
+                                    ></textarea>
+                                </div>
+
+                                <div className='rounded-3xl border border-slate-200 p-4'>
+                                    <div className='flex flex-wrap items-center justify-between gap-3'>
+                                        <div>
+                                            <p className='text-sm font-semibold text-slate-700'>{t.returnImages}</p>
+                                            <p className='mt-1 text-xs text-slate-500'>{t.returnImagesHint}</p>
+                                        </div>
+                                        <span className='rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600'>
+                                            {returnImages.length}/4
+                                        </span>
                                     </div>
-                                )}
+
+                                    <input
+                                        type='file'
+                                        multiple
+                                        accept='image/*'
+                                        onChange={handleReturnImagesChange}
+                                        className='mt-4 block w-full text-sm text-slate-500 file:mr-4 file:rounded-full file:border-0 file:bg-slate-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-100'
+                                    />
+
+                                    {returnImagePreviews.length > 0 && (
+                                        <div className='mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4'>
+                                            {returnImagePreviews.map((image, index) => (
+                                                <div key={image.id} className='group relative overflow-hidden rounded-2xl border border-slate-100 bg-slate-50'>
+                                                    <img src={image.url} className='h-24 w-full object-cover' alt={image.name} />
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => handleRemoveReturnImage(index)}
+                                                        className='absolute right-2 top-2 rounded-full bg-slate-900/80 px-2 py-1 text-[11px] font-semibold text-white opacity-0 transition group-hover:opacity-100'
+                                                    >
+                                                        {t.removeImage}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className='rounded-3xl border border-slate-200 p-4'>
+                                    <p className='text-sm font-semibold text-slate-700'>{t.refundMethodTitle}</p>
+                                    <div className='mt-4 space-y-3'>
+                                        <label
+                                            className={`flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-4 transition ${
+                                                refundMethod === 'Wallet'
+                                                    ? 'border-emerald-300 bg-emerald-50'
+                                                    : 'border-slate-200 hover:border-slate-300'
+                                            }`}
+                                        >
+                                            <input
+                                                name='refundMethod'
+                                                type='radio'
+                                                checked={refundMethod === 'Wallet'}
+                                                onChange={() => setRefundMethod('Wallet')}
+                                                className='mt-1 h-4 w-4 text-emerald-500'
+                                            />
+                                            <div>
+                                                <p className='text-sm font-semibold text-slate-900'>{t.refundWallet}</p>
+                                                <p className='mt-1 text-xs text-slate-500'>{t.refundWalletHint}</p>
+                                            </div>
+                                        </label>
+
+                                        <label
+                                            className={`flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-4 transition ${
+                                                refundMethod === 'Bank'
+                                                    ? 'border-amber-300 bg-amber-50'
+                                                    : 'border-slate-200 hover:border-slate-300'
+                                            }`}
+                                        >
+                                            <input
+                                                name='refundMethod'
+                                                type='radio'
+                                                checked={refundMethod === 'Bank'}
+                                                onChange={() => setRefundMethod('Bank')}
+                                                className='mt-1 h-4 w-4 text-amber-500'
+                                            />
+                                            <div>
+                                                <p className='text-sm font-semibold text-slate-900'>{t.refundBank}</p>
+                                                <p className='mt-1 text-xs text-slate-500'>{t.refundBankHint}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    {refundMethod === 'Bank' && (
+                                        <div className='mt-4 rounded-2xl bg-slate-50 p-4'>
+                                            <p className='mb-3 text-sm font-semibold text-slate-700'>{t.bankDetailsTitle}</p>
+                                            <div className='grid gap-3 sm:grid-cols-2'>
+                                                <input
+                                                    type='text'
+                                                    placeholder={t.bankName}
+                                                    value={bankDetails.bankName}
+                                                    onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
+                                                    className='w-full rounded-xl border border-slate-200 p-3 text-sm outline-none'
+                                                    required
+                                                />
+                                                <input
+                                                    type='text'
+                                                    placeholder={t.accountNumber}
+                                                    value={bankDetails.accountNumber}
+                                                    onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
+                                                    className='w-full rounded-xl border border-slate-200 p-3 text-sm outline-none'
+                                                    required
+                                                />
+                                                <input
+                                                    type='text'
+                                                    placeholder={t.accountName}
+                                                    value={bankDetails.accountName}
+                                                    onChange={(e) => setBankDetails({ ...bankDetails, accountName: e.target.value })}
+                                                    className='w-full rounded-xl border border-slate-200 p-3 text-sm outline-none sm:col-span-2'
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                        <div className='mt-6 flex flex-wrap justify-end gap-3 flex-shrink-0 pt-4 border-t border-slate-100'>
+                        <div className='flex flex-wrap justify-end gap-3 border-t border-slate-100 px-6 py-5 sm:px-7'>
                             <button
-                                onClick={() => setReturnModalOrder(null)}
+                                onClick={closeReturnModal}
                                 className='rounded-full px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100'
                                 type='button'
                             >
@@ -816,7 +1011,7 @@ const Orders = () => {
                             </button>
                             <button
                                 onClick={handleReturnSubmit}
-                                disabled={submittingReturn || !returnReason.trim() || (refundMethod === 'Bank' && (!bankDetails.bankName || !bankDetails.accountName || !bankDetails.accountNumber))}
+                                disabled={submittingReturn || !returnReason.trim() || isBankRefundInvalid}
                                 className='rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50'
                                 type='button'
                             >

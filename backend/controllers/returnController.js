@@ -6,12 +6,33 @@ import logAction from '../utils/logger.js';
 import mongoose from 'mongoose';
 import { processRefundToWallet } from './walletController.js';
 
+const parseBankDetails = (bankDetailsInput) => {
+    if (!bankDetailsInput) return {};
+
+    const parsedValue = typeof bankDetailsInput === 'string'
+        ? JSON.parse(bankDetailsInput)
+        : bankDetailsInput;
+
+    return {
+        bankName: String(parsedValue?.bankName || '').trim(),
+        accountNumber: String(parsedValue?.accountNumber || '').trim(),
+        accountName: String(parsedValue?.accountName || '').trim(),
+    };
+};
+
 const requestReturn = async (req, res) => {
     try {
-        const { userId, orderId, reason, refundMethod, bankDetails } = req.body;
+        const { orderId, reason, refundMethod, bankDetails } = req.body || {};
+        const userId = req.authUserId || req.body?.userId;
+        const normalizedReason = String(reason || '').trim();
+        const normalizedRefundMethod = String(refundMethod || '').trim();
         
-        if (!userId || !orderId || !reason || !refundMethod) {
+        if (!userId || !orderId || !normalizedReason || !normalizedRefundMethod) {
             return res.json({ success: false, message: 'Missing required fields' });
+        }
+
+        if (!['Wallet', 'Bank'].includes(normalizedRefundMethod)) {
+            return res.json({ success: false, message: 'Invalid refund method' });
         }
 
         const image1 = req.files?.image1?.[0];
@@ -47,15 +68,24 @@ const requestReturn = async (req, res) => {
             }
         }
 
+        let normalizedBankDetails = {};
+        if (normalizedRefundMethod === 'Bank') {
+            normalizedBankDetails = parseBankDetails(bankDetails);
+
+            if (!normalizedBankDetails.bankName || !normalizedBankDetails.accountNumber || !normalizedBankDetails.accountName) {
+                return res.json({ success: false, message: 'Incomplete bank details' });
+            }
+        }
+
         const returnData = {
             userId,
             orderId,
-            reason,
+            reason: normalizedReason,
             images: imagesUrl,
             status: 'Pending',
             refundAmount: order.amount, // Default to full amount
-            refundMethod,
-            bankDetails: bankDetails ? JSON.parse(bankDetails) : {}
+            refundMethod: normalizedRefundMethod,
+            bankDetails: normalizedBankDetails
         };
 
         const newReturn = new returnModel(returnData);
@@ -100,7 +130,11 @@ const listReturns = async (req, res) => {
 
 const userReturns = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.authUserId || req.body?.userId;
+        if (!userId) {
+            return res.json({ success: false, message: 'Missing user id' });
+        }
+
         const returns = await returnModel.find({ userId }).sort({ date: -1 });
         res.json({ success: true, returns });
     } catch (error) {

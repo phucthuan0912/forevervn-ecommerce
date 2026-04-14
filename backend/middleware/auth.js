@@ -15,6 +15,10 @@ const authUser = async (req, res, next) => {
             return res.json({ success: false, message: 'Invalid Token' });
         }
 
+        req.authUserId = decodedId;
+        req.userId = decodedId;
+        req.tokenPayload = tokenDecode;
+        req.body = req.body && typeof req.body === 'object' ? req.body : {};
         req.body.userId = decodedId;
         next();
 

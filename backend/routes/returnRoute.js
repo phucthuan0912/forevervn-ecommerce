@@ -6,12 +6,12 @@ import upload from '../middleware/multer.js';
 
 const returnRouter = express.Router();
 
-returnRouter.post('/request', authUser, upload.fields([
+returnRouter.post('/request', upload.fields([
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
     { name: 'image3', maxCount: 1 },
     { name: 'image4', maxCount: 1 }
-]), requestReturn);
+]), authUser, requestReturn);
 
 returnRouter.post('/user-returns', authUser, userReturns);
 

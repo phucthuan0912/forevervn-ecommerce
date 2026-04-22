@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="AD11 - Quản lý danh mục &amp; Banner" id="ad11">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="AD11 - Biểu đồ hoạt động: Quản lý danh mục &amp; Banner" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Admin -->
+        <mxCell id="lane_admin" value="Admin" style="swimlane;startSize=30;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="200" height="800" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Hệ thống -->
+        <mxCell id="lane_sys" value="Hệ thống" style="swimlane;startSize=30;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="240" y="80" width="280" height="800" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Cloudinary -->
+        <mxCell id="lane_cloud" value="Cloudinary" style="swimlane;startSize=30;horizontal=0;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="200" height="800" as="geometry" />
+        </mxCell>
+
+        <!-- ===== NODES ===== -->
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="120" y="120" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Thao tác -->
+        <mxCell id="dec_action" value="Thao tác?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="95" y="190" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== DANH MỤC ===== -->
+        <mxCell id="act_add_cat" value="Nhập tên danh mục &amp; upload ảnh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Upload ảnh danh mục -->
+        <mxCell id="act_upload_cat_img" value="Upload ảnh lên Cloudinary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="550" y="290" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu danh mục -->
+        <mxCell id="act_save_cat" value="Lưu danh mục vào MongoDB (name, image)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="290" width="210" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Thêm danh mục con -->
+        <mxCell id="act_add_subcat" value="Nhập tên danh mục con &amp; chọn danh mục cha" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="370" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu danh mục con -->
+        <mxCell id="act_save_subcat" value="Lưu subCategory vào MongoDB (name, category)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="370" width="210" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Xoá danh mục -->
+        <mxCell id="act_delete_cat" value="Xoá danh mục / danh mục con" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="460" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xoá khỏi DB -->
+        <mxCell id="act_delete_cat_db" value="Xoá khỏi MongoDB, ghi Audit Log" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="460" width="210" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== BANNER ===== -->
+        <mxCell id="act_add_banner" value="Nhập tiêu đề, link &amp; upload ảnh banner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="540" width="160" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Upload ảnh banner -->
+        <mxCell id="act_upload_banner_img" value="Upload ảnh banner lên Cloudinary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="550" y="540" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu banner -->
+        <mxCell id="act_save_banner" value="Lưu banner vào MongoDB (title, imageUrl, link, isActive)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="540" width="210" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Bật/tắt banner -->
+        <mxCell id="act_toggle_banner" value="Bật/Tắt banner (isActive)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="630" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Cập nhật isActive -->
+        <mxCell id="act_update_banner" value="Cập nhật isActive trong MongoDB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="630" width="210" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xoá banner -->
+        <mxCell id="act_delete_banner" value="Xoá banner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xoá banner DB -->
+        <mxCell id="act_delete_banner_db" value="Xoá banner khỏi MongoDB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="700" width="210" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="365" y="780" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="start" target="dec_action" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="Thêm danh mục" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_add_cat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="Thêm danh mục con" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_add_subcat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="Xoá danh mục" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_delete_cat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="Thêm banner" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_add_banner" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="Bật/Tắt banner" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_toggle_banner" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="Xoá banner" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_delete_banner" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_cat" target="act_upload_cat_img" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_cat" target="act_save_cat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_cat" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_subcat" target="act_save_subcat" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_subcat" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_cat" target="act_delete_cat_db" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_cat_db" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_banner" target="act_upload_banner_img" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_banner" target="act_save_banner" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_banner" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_toggle_banner" target="act_update_banner" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_update_banner" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_banner" target="act_delete_banner_db" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_banner_db" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

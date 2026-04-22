@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="AD04 - Trả hàng &amp; Hoàn tiền" id="ad04">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="AD04 - Biểu đồ hoạt động: Trả hàng &amp; Hoàn tiền" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1000" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Khách hàng -->
+        <mxCell id="lane_kh" value="Khách hàng" style="swimlane;startSize=30;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="220" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Admin -->
+        <mxCell id="lane_admin" value="Admin / Nhân viên" style="swimlane;startSize=30;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="260" y="80" width="250" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Hệ thống -->
+        <mxCell id="lane_sys" value="Hệ thống" style="swimlane;startSize=30;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="510" y="80" width="250" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Kho hàng -->
+        <mxCell id="lane_inv" value="Kho hàng" style="swimlane;startSize=30;horizontal=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="760" y="80" width="200" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- ===== NODES ===== -->
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="130" y="120" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Điều kiện: Đơn hàng Delivered/Received -->
+        <mxCell id="act_check_status" value="Kiểm tra đơn hàng: Delivered / Received?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="120" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Đủ điều kiện? -->
+        <mxCell id="dec_eligible" value="Đủ điều kiện?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="565" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Nhập lý do trả hàng -->
+        <mxCell id="act_input_reason" value="Nhập lý do trả hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="200" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Upload ảnh minh chứng -->
+        <mxCell id="act_upload_img" value="Upload ảnh minh chứng (tối đa 4 ảnh)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="270" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Chọn phương thức hoàn tiền -->
+        <mxCell id="dec_refund_method" value="Phương thức hoàn tiền?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="350" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Nhập thông tin ngân hàng -->
+        <mxCell id="act_bank_info" value="Nhập thông tin ngân hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="440" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Gửi yêu cầu trả hàng -->
+        <mxCell id="act_submit_return" value="Gửi yêu cầu trả hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="510" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu return request, cập nhật đơn: Return Requested -->
+        <mxCell id="act_save_return" value="Lưu return request, đơn hàng: Return Requested" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="510" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Admin xem yêu cầu -->
+        <mxCell id="act_admin_view" value="Admin xem yêu cầu trả hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="590" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Admin duyệt? -->
+        <mxCell id="dec_admin_approve" value="Quyết định?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="315" y="660" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Từ chối -->
+        <mxCell id="act_reject" value="Từ chối: đơn hàng về Delivered" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="530" y="660" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Duyệt: Returning -->
+        <mxCell id="act_approve" value="Duyệt: đơn hàng → Returning" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="750" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Hoàn thành: Returned -->
+        <mxCell id="act_complete" value="Hoàn thành: đơn hàng → Returned" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="820" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Hoàn kho -->
+        <mxCell id="act_restore_inv" value="Hoàn kho (inventoryDeducted = false)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="790" y="820" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Phương thức hoàn tiền -->
+        <mxCell id="dec_refund_exec" value="Hoàn tiền qua?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="315" y="890" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Hoàn vào ví -->
+        <mxCell id="act_refund_wallet" value="Cộng tiền vào Ví, ghi walletTransaction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="890" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Hoàn qua ngân hàng -->
+        <mxCell id="act_refund_bank" value="Admin chuyển khoản thủ công" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="970" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="615" y="970" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Không đủ điều kiện -->
+        <mxCell id="act_not_eligible" value="Thông báo: Không đủ điều kiện trả hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="530" y="270" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="start" target="act_check_status" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_check_status" target="dec_eligible" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="Có" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_eligible" target="act_input_reason" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="Không" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_eligible" target="act_not_eligible" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_input_reason" target="act_upload_img" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_upload_img" target="dec_refund_method" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="Ngân hàng" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_refund_method" target="act_bank_info" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="Ví" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_refund_method" target="act_submit_return" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_bank_info" target="act_submit_return" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_submit_return" target="act_save_return" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_return" target="act_admin_view" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_admin_view" target="dec_admin_approve" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" value="Từ chối" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_admin_approve" target="act_reject" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="Duyệt" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_admin_approve" target="act_approve" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_approve" target="act_complete" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_complete" target="act_restore_inv" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_complete" target="dec_refund_exec" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" value="Ví" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_refund_exec" target="act_refund_wallet" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" value="Ngân hàng" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_refund_exec" target="act_refund_bank" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_refund_wallet" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_refund_bank" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_reject" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

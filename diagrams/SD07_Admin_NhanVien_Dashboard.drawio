@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="SD07 - Admin, Nhân viên &amp; Dashboard" id="sd07">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="SD07 - Biểu đồ tuần tự: Đăng nhập Admin, Quản lý nhân viên &amp; Dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ACTORS / OBJECTS -->
+        <mxCell id="actor_admin" value="Admin" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_admin_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="70" y="140" as="sourcePoint"/><mxPoint x="70" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="bound_login" value="Form&lt;br&gt;DangNhapAdmin" style="shape=mxgraph.uml.boundary;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="220" y="80" width="110" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bound_login_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="275" y="140" as="sourcePoint"/><mxPoint x="275" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="ctrl_auth" value="Control&lt;br&gt;XacThuc" style="shape=mxgraph.uml.control;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="480" y="80" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl_auth_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="520" y="140" as="sourcePoint"/><mxPoint x="520" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_user" value="TaiKhoan" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="700" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_user_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="750" y="140" as="sourcePoint"/><mxPoint x="750" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="ctrl_dashboard" value="Control&lt;br&gt;Dashboard" style="shape=mxgraph.uml.control;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="920" y="80" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl_dashboard_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="960" y="140" as="sourcePoint"/><mxPoint x="960" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_order" value="DonHang" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_order_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1170" y="140" as="sourcePoint"/><mxPoint x="1170" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_log" value="AuditLog" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_log_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1390" y="140" as="sourcePoint"/><mxPoint x="1390" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 1: DANG NHAP ADMIN -->
+        <mxCell id="lbl1" value="[1. Đăng nhập Admin/Nhân viên]" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="165" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab1" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="62" y="185" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab2" value="" style="fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="267" y="185" width="16" height="80" as="geometry"/></mxCell>
+        <mxCell id="ab3" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="512" y="205" width="16" height="150" as="geometry"/></mxCell>
+        <mxCell id="ab4" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="742" y="225" width="16" height="80" as="geometry"/></mxCell>
+
+        <mxCell id="m1" value="1. Nhập email &amp; mật khẩu" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="200" as="sourcePoint"/><mxPoint x="267" y="200" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. POST /api/user/admin {email, password}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="283" y="220" as="sourcePoint"/><mxPoint x="512" y="220" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- ALT: Super Admin hay DB -->
+        <mxCell id="alt1" value="alt" style="shape=mxgraph.uml.frame;whiteSpace=wrap;html=1;fontSize=11;align=left;verticalAlign=top;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="240" width="1000" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="alt1_c1" value="[email == ADMIN_EMAIL &amp;&amp; password == ADMIN_PASSWORD (env)]" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="210" y="248" width="450" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="m3" value="3. jwt.sign({email, role:'Admin'}) → {success:true, token, role:'Admin'}" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="512" y="275" as="sourcePoint"/><mxPoint x="78" y="275" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="alt1_div" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="200" y="305" as="sourcePoint"/><mxPoint x="1200" y="305" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="alt1_c2" value="[DB check: role ∈ {Admin, Employee}]" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontStyle=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="210" y="310" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="m4" value="4. findOne({email}) → bcrypt.compare(password)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="528" y="335" as="sourcePoint"/><mxPoint x="742" y="335" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5. jwt.sign({id, role}) → {success:true, token, role}" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="512" y="375" as="sourcePoint"/><mxPoint x="78" y="375" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 2: TAO NHAN VIEN -->
+        <mxCell id="lbl2" value="[2. Admin tạo tài khoản nhân viên]" style="text;html=1;strokeColor=none;fillColor=#dae8fc;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="415" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab5" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="62" y="440" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab6" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="512" y="460" width="16" height="180" as="geometry"/></mxCell>
+        <mxCell id="ab7" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="742" y="480" width="16" height="100" as="geometry"/></mxCell>
+
+        <mxCell id="m6" value="6. Nhập tên, email, mật khẩu nhân viên" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="455" as="sourcePoint"/><mxPoint x="267" y="455" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="7. POST /api/user/create-employee {name, email, password}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="283" y="475" as="sourcePoint"/><mxPoint x="512" y="475" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m8" value="8. findOne({email}) → kiểm tra tồn tại" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="528" y="495" as="sourcePoint"/><mxPoint x="742" y="495" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="9. Chưa tồn tại" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="742" y="520" as="sourcePoint"/><mxPoint x="528" y="520" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="10. bcrypt.hash(password, 10)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="528" y="545" as="sourcePoint"/><mxPoint x="528" y="545" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m11" value="11. insertOne({name, email, hashedPwd, role:'Employee'})" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="528" y="570" as="sourcePoint"/><mxPoint x="742" y="570" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m12" value="12. logAction(adminEmail, 'CREATE_EMPLOYEE', empId)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="528" y="600" as="sourcePoint"/><mxPoint x="1390" y="600" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m13" value="13. {success:true, 'Employee account created'}" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="512" y="630" as="sourcePoint"/><mxPoint x="78" y="630" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 3: DASHBOARD -->
+        <mxCell id="lbl3" value="[3. Dashboard thống kê doanh thu]" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="670" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab8" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="62" y="695" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab9" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="952" y="715" width="16" height="250" as="geometry"/></mxCell>
+        <mxCell id="ab10" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1162" y="735" width="16" height="180" as="geometry"/></mxCell>
+
+        <mxCell id="m14" value="14. Truy cập Dashboard, chọn khoảng thời gian" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="710" as="sourcePoint"/><mxPoint x="267" y="710" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m15" value="15. GET /api/dashboard/stats?from=&amp;to=" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="283" y="730" as="sourcePoint"/><mxPoint x="952" y="730" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m16" value="16. aggregate: tổng revenue, COGS, profit theo kỳ" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="968" y="755" as="sourcePoint"/><mxPoint x="1162" y="755" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m17" value="17. aggregate: đơn hàng theo trạng thái" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="968" y="780" as="sourcePoint"/><mxPoint x="1162" y="780" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m18" value="18. aggregate: top sản phẩm bán chạy" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="968" y="805" as="sourcePoint"/><mxPoint x="1162" y="805" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m19" value="19. count: khách hàng mới trong kỳ" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="968" y="830" as="sourcePoint"/><mxPoint x="1162" y="830" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m20" value="20. query: sản phẩm tồn kho thấp" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="968" y="855" as="sourcePoint"/><mxPoint x="1162" y="855" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m21" value="21. Tất cả kết quả aggregate" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1162" y="905" as="sourcePoint"/><mxPoint x="968" y="905" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m22" value="22. {success:true, revenue, orders, topProducts, newCustomers, lowStock}" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="952" y="940" as="sourcePoint"/><mxPoint x="78" y="940" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m23" value="23. Render biểu đồ doanh thu, bảng đơn hàng, top sản phẩm" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="267" y="970" as="sourcePoint"/><mxPoint x="78" y="970" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

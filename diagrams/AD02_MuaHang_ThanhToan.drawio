@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="AD02 - Mua hàng &amp; Thanh toán" id="ad02">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="AD02 - Biểu đồ hoạt động: Mua hàng &amp; Thanh toán" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="900" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Khách hàng -->
+        <mxCell id="lane_kh" value="Khách hàng" style="swimlane;startSize=30;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="220" height="1020" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Hệ thống -->
+        <mxCell id="lane_sys" value="Hệ thống" style="swimlane;startSize=30;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="260" y="80" width="280" height="1020" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Cổng thanh toán (SePay) -->
+        <mxCell id="lane_pay" value="Cổng thanh toán (SePay)" style="swimlane;startSize=30;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="540" y="80" width="220" height="1020" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Kho hàng -->
+        <mxCell id="lane_inv" value="Kho hàng" style="swimlane;startSize=30;horizontal=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="760" y="80" width="220" height="1020" as="geometry" />
+        </mxCell>
+
+        <!-- ===== NODES ===== -->
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="130" y="120" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Duyệt sản phẩm -->
+        <mxCell id="act_browse" value="Duyệt / Tìm kiếm sản phẩm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="190" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xem chi tiết sản phẩm -->
+        <mxCell id="act_detail" value="Xem chi tiết sản phẩm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="260" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Kiểm tra tồn kho -->
+        <mxCell id="act_check_stock" value="Kiểm tra tồn kho theo size/màu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="260" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Còn hàng? -->
+        <mxCell id="dec_stock" value="Còn hàng?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="330" y="330" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Chọn size, màu, số lượng -->
+        <mxCell id="act_select" value="Chọn size, màu, số lượng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="420" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Thêm vào giỏ hàng -->
+        <mxCell id="act_add_cart" value="Thêm vào giỏ hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="490" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu giỏ hàng vào DB -->
+        <mxCell id="act_save_cart" value="Lưu cartData vào DB (userId)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="490" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xem giỏ hàng -->
+        <mxCell id="act_view_cart" value="Xem giỏ hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="560" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Nhập voucher -->
+        <mxCell id="act_voucher" value="Nhập mã voucher (tuỳ chọn)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="630" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Kiểm tra voucher -->
+        <mxCell id="act_check_voucher" value="Kiểm tra voucher hợp lệ &amp; áp dụng giảm giá" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="630" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Chọn địa chỉ giao hàng -->
+        <mxCell id="act_address" value="Chọn / Nhập địa chỉ giao hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="710" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Chọn phương thức thanh toán -->
+        <mxCell id="dec_payment" value="Phương thức thanh toán?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="85" y="780" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- COD -->
+        <mxCell id="act_cod" value="Đặt hàng COD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="760" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Ví điện tử -->
+        <mxCell id="act_wallet_check" value="Kiểm tra số dư ví" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="820" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Banking SePay -->
+        <mxCell id="act_sepay_create" value="Tạo đơn hàng &amp; SePay invoice" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="880" width="200" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- SePay checkout -->
+        <mxCell id="act_sepay_pay" value="Hiển thị QR / form chuyển khoản" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="570" y="880" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- IPN callback -->
+        <mxCell id="act_ipn" value="IPN Webhook: xác nhận thanh toán" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="570" y="940" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Cập nhật trạng thái đơn hàng -->
+        <mxCell id="act_order_placed" value="Tạo đơn hàng: status = Order Placed, Xoá giỏ hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="290" y="960" width="200" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Ghi log kho -->
+        <mxCell id="act_inv_log" value="Ghi nhận kế hoạch trừ kho (khi Packing)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="790" y="960" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="360" y="1040" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Hết hàng thông báo -->
+        <mxCell id="act_out_stock" value="Hiển thị: Hết hàng" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="570" y="330" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="start" target="act_browse" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_browse" target="act_detail" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_detail" target="act_check_stock" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_check_stock" target="dec_stock" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="Còn hàng" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_stock" target="act_select" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="Hết hàng" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_stock" target="act_out_stock" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_select" target="act_add_cart" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_add_cart" target="act_save_cart" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_cart" target="act_view_cart" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_view_cart" target="act_voucher" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_voucher" target="act_check_voucher" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_check_voucher" target="act_address" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_address" target="dec_payment" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" value="COD" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_payment" target="act_cod" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" value="Ví điện tử" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_payment" target="act_wallet_check" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" value="Banking" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_payment" target="act_sepay_create" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_sepay_create" target="act_sepay_pay" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_sepay_pay" target="act_ipn" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_ipn" target="act_order_placed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_cod" target="act_order_placed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_wallet_check" target="act_order_placed" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_order_placed" target="act_inv_log" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e23" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_order_placed" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

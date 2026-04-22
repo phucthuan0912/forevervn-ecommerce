@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="AD09 - Quản lý nhân viên" id="ad09">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="AD09 - Biểu đồ hoạt động: Quản lý nhân viên (Admin)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Admin -->
+        <mxCell id="lane_admin" value="Admin (Super)" style="swimlane;startSize=30;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="200" height="700" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Hệ thống -->
+        <mxCell id="lane_sys" value="Hệ thống" style="swimlane;startSize=30;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="240" y="80" width="280" height="700" as="geometry" />
+        </mxCell>
+
+        <!-- Swimlane: Nhân viên -->
+        <mxCell id="lane_emp" value="Nhân viên" style="swimlane;startSize=30;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="200" height="700" as="geometry" />
+        </mxCell>
+
+        <!-- ===== NODES ===== -->
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="120" y="120" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Thao tác -->
+        <mxCell id="dec_action" value="Thao tác?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="95" y="190" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ===== TẠO NHÂN VIÊN ===== -->
+        <mxCell id="act_input_emp" value="Nhập tên, email, mật khẩu nhân viên" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Kiểm tra email tồn tại -->
+        <mxCell id="act_check_email" value="Kiểm tra email đã tồn tại trong DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="290" width="210" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Decision: Tồn tại? -->
+        <mxCell id="dec_email_exist" value="Đã tồn tại?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="315" y="370" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Hash mật khẩu & lưu -->
+        <mxCell id="act_create_emp" value="Hash mật khẩu (bcrypt), lưu user với role=Employee" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="460" width="210" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Ghi audit log -->
+        <mxCell id="act_audit_create" value="Ghi Audit Log: CREATE_EMPLOYEE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="540" width="210" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lỗi email tồn tại -->
+        <mxCell id="act_err_email" value="Thông báo: Tài khoản đã tồn tại" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="550" y="370" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== CẬP NHẬT NHÂN VIÊN ===== -->
+        <mxCell id="act_select_emp" value="Chọn nhân viên cần cập nhật" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="610" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Chỉnh sửa thông tin -->
+        <mxCell id="act_edit_emp" value="Chỉnh sửa tên / email / mật khẩu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="670" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Lưu cập nhật -->
+        <mxCell id="act_save_emp" value="Cập nhật DB, ghi Audit Log: UPDATE_EMPLOYEE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="670" width="210" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ===== XOÁ NHÂN VIÊN ===== -->
+        <mxCell id="act_delete_emp" value="Chọn nhân viên &amp; xác nhận xoá" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="740" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Xoá khỏi DB -->
+        <mxCell id="act_delete_db" value="Xoá user khỏi DB, ghi Audit Log: DELETE_USER" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="740" width="210" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Nhân viên đăng nhập -->
+        <mxCell id="act_emp_login" value="Nhân viên đăng nhập bằng email/mật khẩu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="550" y="460" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- JWT với role Employee -->
+        <mxCell id="act_emp_jwt" value="Nhận JWT token với role=Employee, truy cập chức năng được phân quyền" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="550" y="550" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="365" y="820" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ===== EDGES ===== -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="start" target="dec_action" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="Tạo mới" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_input_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="Cập nhật" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_select_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="Xoá" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_action" target="act_delete_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_input_emp" target="act_check_email" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_check_email" target="dec_email_exist" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="Chưa tồn tại" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_email_exist" target="act_create_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="Đã tồn tại" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="dec_email_exist" target="act_err_email" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_create_emp" target="act_audit_create" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_create_emp" target="act_emp_login" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_emp_login" target="act_emp_jwt" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_audit_create" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_select_emp" target="act_edit_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_edit_emp" target="act_save_emp" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_save_emp" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_emp" target="act_delete_db" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="act_delete_db" target="end" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

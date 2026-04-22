@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="draw.io" version="21.0.0">
+  <diagram name="SD06 - Đánh giá, Voucher &amp; Ví" id="sd06">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" /><mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="SD06 - Biểu đồ tuần tự: Đánh giá sản phẩm / Voucher / Ví điện tử" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ACTORS / OBJECTS -->
+        <mxCell id="actor_kh" value="Khach Hang" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="80" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor_kh_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="70" y="140" as="sourcePoint"/><mxPoint x="70" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="bound_review" value="Form&lt;br&gt;DanhGia" style="shape=mxgraph.uml.boundary;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="220" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bound_review_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="270" y="140" as="sourcePoint"/><mxPoint x="270" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="ctrl_review" value="Control&lt;br&gt;DanhGia" style="shape=mxgraph.uml.control;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="450" y="80" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl_review_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="490" y="140" as="sourcePoint"/><mxPoint x="490" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_cloud" value="Cloudinary" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="660" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_cloud_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="710" y="140" as="sourcePoint"/><mxPoint x="710" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_review" value="DanhGia" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="860" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_review_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="910" y="140" as="sourcePoint"/><mxPoint x="910" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_voucher" value="Voucher" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_voucher_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1110" y="140" as="sourcePoint"/><mxPoint x="1110" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="entity_wallet" value="Vi/TaiKhoan" style="shape=mxgraph.uml.entity;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_wallet_line" value="" style="endArrow=none;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1310" y="140" as="sourcePoint"/><mxPoint x="1310" y="1280" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 1: DANH GIA SAN PHAM -->
+        <mxCell id="lbl1" value="[1. Đánh giá sản phẩm]" style="text;html=1;strokeColor=none;fillColor=#dae8fc;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="165" width="300" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab1" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="62" y="185" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab2" value="" style="fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="262" y="185" width="16" height="80" as="geometry"/></mxCell>
+        <mxCell id="ab3" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="482" y="205" width="16" height="180" as="geometry"/></mxCell>
+        <mxCell id="ab4" value="" style="fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="702" y="225" width="16" height="50" as="geometry"/></mxCell>
+        <mxCell id="ab5" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="902" y="285" width="16" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="m1" value="1. Nhập rating (1-5), bình luận, upload ảnh" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="200" as="sourcePoint"/><mxPoint x="262" y="200" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m2" value="2. POST /api/review/add (multipart: userId, productId, rating, comment, images)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="278" y="220" as="sourcePoint"/><mxPoint x="482" y="220" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m3" value="3. findById(userId) → lấy userName" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="240" as="sourcePoint"/><mxPoint x="902" y="240" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m4" value="4. cloudinary.uploader.upload(images)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="265" as="sourcePoint"/><mxPoint x="702" y="265" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m5" value="5. imageUrls[]" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="702" y="290" as="sourcePoint"/><mxPoint x="498" y="290" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m6" value="6. insertOne({userId, productId, userName, rating, comment, images, status:true})" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="310" as="sourcePoint"/><mxPoint x="902" y="310" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m7" value="7. {success:true, 'Review added'}" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="482" y="380" as="sourcePoint"/><mxPoint x="78" y="380" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 2: VOUCHER -->
+        <mxCell id="lbl2" value="[2. Áp dụng Voucher khi checkout]" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="415" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab6" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="62" y="440" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab7" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="482" y="460" width="16" height="150" as="geometry"/></mxCell>
+        <mxCell id="ab8" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1102" y="480" width="16" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="m8" value="8. Nhập mã voucher" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="455" as="sourcePoint"/><mxPoint x="262" y="455" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m9" value="9. POST /api/voucher/validate {code}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="278" y="475" as="sourcePoint"/><mxPoint x="482" y="475" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m10" value="10. findOne({code: /^code$/i, isActive:true})" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="495" as="sourcePoint"/><mxPoint x="1102" y="495" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m11" value="11. Voucher document" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1102" y="520" as="sourcePoint"/><mxPoint x="498" y="520" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m12" value="12. Nếu code=BANMOI: countDocuments({userId, status:'Delivered'})" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="545" as="sourcePoint"/><mxPoint x="1102" y="545" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m13" value="13. {success:true, discountPercent} → Frontend tính giảm giá" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="482" y="600" as="sourcePoint"/><mxPoint x="78" y="600" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PHAN 3: NAP TIEN VI -->
+        <mxCell id="lbl3" value="[3. Nạp tiền vào Ví qua SePay]" style="text;html=1;strokeColor=none;fillColor=#e1d5e7;align=left;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="635" width="350" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="ab9" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="62" y="660" width="16" height="30" as="geometry"/></mxCell>
+        <mxCell id="ab10" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="482" y="680" width="16" height="300" as="geometry"/></mxCell>
+        <mxCell id="ab11" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1302" y="720" width="16" height="50" as="geometry"/></mxCell>
+        <mxCell id="ab12" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1302" y="820" width="16" height="50" as="geometry"/></mxCell>
+        <mxCell id="ab13" value="" style="fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="1302" y="900" width="16" height="50" as="geometry"/></mxCell>
+
+        <mxCell id="m14" value="14. Nhập số tiền nạp (≥ 10.000đ)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="78" y="675" as="sourcePoint"/><mxPoint x="262" y="675" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m15" value="15. POST /api/wallet/topup {userId, amount}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="278" y="695" as="sourcePoint"/><mxPoint x="482" y="695" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m16" value="16. Tạo invoiceId = WT_{userId}_{timestamp}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="720" as="sourcePoint"/><mxPoint x="498" y="720" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m17" value="17. initOneTimePaymentFields(invoiceId, amount)" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="745" as="sourcePoint"/><mxPoint x="1302" y="745" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m18" value="18. checkoutUrl + checkoutFields" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1302" y="770" as="sourcePoint"/><mxPoint x="498" y="770" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m19" value="19. Redirect trang SePay → chuyển khoản" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="482" y="800" as="sourcePoint"/><mxPoint x="78" y="800" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m20" value="20. IPN: POST /api/order/sepay-ipn {ORDER_PAID, invoiceId=WT_userId_ts}" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1302" y="840" as="sourcePoint"/><mxPoint x="498" y="840" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m21" value="21. startTransaction() → user.walletBalance += amount → save()" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="865" as="sourcePoint"/><mxPoint x="1302" y="865" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m22" value="22. insertOne(walletTransaction {type:'Credit', amount})" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="895" as="sourcePoint"/><mxPoint x="1302" y="895" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m23" value="23. commitTransaction() → logAction('WALLET_TOPUP')" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="925" as="sourcePoint"/><mxPoint x="498" y="925" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m24" value="24. HTTP 200 OK" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="498" y="950" as="sourcePoint"/><mxPoint x="1302" y="950" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="m25" value="25. Redirect /my-wallet?success=true" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1302" y="975" as="sourcePoint"/><mxPoint x="78" y="975" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -3,6 +3,7 @@ import { ShopContext } from '../context/ShopContext';
 import { useLanguage } from '../context/LanguageContext';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
+import SmartSearch from '../components/SmartSearch';
 
 const parsePrice = (price) => {
     if (typeof price === 'number') return price < 1000 ? price * 1000 : price;
@@ -111,6 +112,9 @@ const Collection = () => {
     const [onlyBestSeller, setOnlyBestSeller] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState({});
 
+    const [smartSearchResults, setSmartSearchResults] = useState(null);
+    const [smartSearchCriteria, setSmartSearchCriteria] = useState(null);
+
     const STEP = 16;
     const [visibleCount, setVisibleCount] = useState(STEP);
 
@@ -159,10 +163,24 @@ const Collection = () => {
         setMaxPrice('');
         setOnlyBestSeller(false);
         setExpandedCategories({});
+        setSmartSearchResults(null);
+        setSmartSearchCriteria(null);
+    };
+
+    const handleSmartSearchResults = (products, criteria) => {
+        setSmartSearchResults(products);
+        setSmartSearchCriteria(criteria);
+        
+        // Tự động apply các filter từ AI
+        if (criteria.categories?.length > 0) setCategory(criteria.categories);
+        if (criteria.subCategories?.length > 0) setSubCategory(criteria.subCategories);
+        if (criteria.minPrice) setMinPrice(criteria.minPrice.toString());
+        if (criteria.maxPrice) setMaxPrice(criteria.maxPrice.toString());
     };
 
     const filteredAndSorted = useMemo(() => {
-        let list = Array.isArray(products) ? [...products] : [];
+        // Nếu có kết quả từ smart search, ưu tiên hiển thị
+        let list = smartSearchResults ? [...smartSearchResults] : (Array.isArray(products) ? [...products] : []);
 
         if (category.length > 0) {
             list = list.filter((p) => category.includes(p.category));
@@ -225,6 +243,7 @@ const Collection = () => {
         minPrice,
         maxPrice,
         onlyBestSeller,
+        smartSearchResults,
     ]);
 
     const categoryOptions = categories.length === 0
@@ -271,6 +290,11 @@ const Collection = () => {
                         </select>
                     </div>
                 </div>
+            </section>
+
+            {/* Khối Tìm kiếm thông minh được đưa ra giữa, luôn hiển thị */}
+            <section className="px-5 sm:px-8 max-w-5xl mx-auto w-full">
+                <SmartSearch onSearchResults={handleSmartSearchResults} />
             </section>
 
             <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
@@ -412,6 +436,12 @@ const Collection = () => {
                                 <p className="mt-2 text-sm text-slate-500 sm:text-base">
                                     {t.matchedCount(filteredAndSorted.length)}
                                 </p>
+                                {smartSearchCriteria && (
+                                    <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-slate-900 to-slate-700 px-3 py-1 text-xs font-semibold text-white">
+                                        <span>✨</span>
+                                        <span>Kết quả tìm kiếm thông minh</span>
+                                    </div>
+                                )}
                             </div>
 
                             <button

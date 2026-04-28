@@ -53,7 +53,8 @@ const VirtualTryOn = ({ productImg, productName, onClose }) => {
             }
         } catch (error) {
             console.error("Lỗi Try-On:", error);
-            toast.error("Hệ thống AI hiện đang quá tải. Vui lòng thử lại sau!");
+            const serverMsg = error?.response?.data?.message;
+            toast.error(serverMsg || "Hệ thống AI hiện đang quá tải. Vui lòng thử lại sau!", { autoClose: 5000 });
         } finally {
             setIsProcessing(false);
         }
